@@ -1,0 +1,3106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>irumah.my | Kota Kinabalu Property Portal</title>
+    
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Supabase JS v2 SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        /* Custom Scrollbar for Listing Feed */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Google Maps InfoWindow Polish */
+        .gm-style .gm-style-iw-c {
+            padding: 0 !important;
+            border-radius: 14px !important;
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.22) !important;
+            overflow: hidden !important;
+        }
+        .gm-style .gm-style-iw-d {
+            overflow: hidden !important;
+            padding: 0 !important;
+        }
+        .gm-style .gm-style-iw-chr {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            z-index: 20;
+        }
+        .gm-style button.gm-ui-hover-effect {
+            background: rgba(15, 23, 42, 0.72) !important;
+            border-radius: 9999px !important;
+            width: 26px !important;
+            height: 26px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        .gm-style button.gm-ui-hover-effect span {
+            background-color: #ffffff !important;
+        }
+
+        /* Smooth Fade In */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.25s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased selection:bg-blue-600 selection:text-white">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-[9999] flex flex-col gap-2.5 pointer-events-none"></div>
+
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-[1920px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+            <!-- Brand Logo (lowercase irumah.my) -->
+            <div class="flex items-center gap-3 cursor-pointer shrink-0" onclick="navigateToPage('home')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white shadow-md shadow-blue-600/20">
+                    <i class="fa-solid fa-house-chimney text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-display font-extrabold text-lg sm:text-xl tracking-tight text-slate-900 leading-none lowercase">
+                        irumah<span class="text-blue-600">.my</span>
+                    </h1>
+                    <p class="text-[11px] font-medium text-slate-500 tracking-wide mt-0.5">KOTA KINABALU REALTY</p>
+                </div>
+            </div>
+
+            <!-- Main Portal Navigation Pages -->
+            <nav id="main-page-nav" class="hidden xl:flex items-center gap-1 text-xs font-semibold text-slate-600">
+                <button type="button" data-nav="sale" onclick="navigateToPage('sale')" class="nav-page-btn px-3 py-2 rounded-xl hover:bg-slate-100 hover:text-blue-600 transition">Property For Sale</button>
+                <button type="button" data-nav="rent" onclick="navigateToPage('rent')" class="nav-page-btn px-3 py-2 rounded-xl hover:bg-slate-100 hover:text-blue-600 transition">Property For Rent</button>
+                <button type="button" data-nav="projects" onclick="navigateToPage('projects')" class="nav-page-btn px-3 py-2 rounded-xl hover:bg-slate-100 hover:text-blue-600 transition">New Projects</button>
+                <button type="button" data-nav="buyer" onclick="navigateToPage('buyer')" class="nav-page-btn px-3 py-2 rounded-xl hover:bg-slate-100 hover:text-blue-600 transition">Ready Buyer</button>
+                <button type="button" data-nav="tenant" onclick="navigateToPage('tenant')" class="nav-page-btn px-3 py-2 rounded-xl hover:bg-slate-100 hover:text-blue-600 transition">Ready Tenant</button>
+                <button type="button" data-nav="agents" onclick="navigateToPage('agents')" class="nav-page-btn px-3 py-2 rounded-xl hover:bg-slate-100 hover:text-blue-600 transition">Agents</button>
+                <button type="button" data-nav="about" onclick="navigateToPage('about')" class="nav-page-btn px-3 py-2 rounded-xl hover:bg-slate-100 hover:text-blue-600 transition">About</button>
+                <button type="button" data-nav="contact" onclick="navigateToPage('contact')" class="nav-page-btn px-3 py-2 rounded-xl hover:bg-slate-100 hover:text-blue-600 transition">Contact</button>
+            </nav>
+
+            <!-- Compact Mobile/Tablet Page Selector -->
+            <div class="flex xl:hidden items-center">
+                <select id="mobile-page-select" onchange="navigateToPage(this.value)" aria-label="Navigate Page" class="px-2.5 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold text-slate-700 outline-none">
+                    <option value="home">Home (All Listings)</option>
+                    <option value="sale">Property For Sale</option>
+                    <option value="rent">Property For Rent</option>
+                    <option value="projects">New Projects</option>
+                    <option value="buyer">Ready Buyer</option>
+                    <option value="tenant">Ready Tenant</option>
+                    <option value="agents">Agents</option>
+                    <option value="about">About</option>
+                    <option value="contact">Contact</option>
+                </select>
+            </div>
+
+            <!-- Right Navigation Actions (NO Public Registration!) -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- Supabase Sync Indicator -->
+                <div id="db-status-pill" onclick="syncFromSupabase(true)" title="Click to re-sync with Supabase" class="cursor-pointer hidden sm:inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                    <span id="db-status-dot" class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                    <span id="db-status-text">Connecting DB...</span>
+                </div>
+
+                <!-- View Switcher when logged in -->
+                <div id="nav-auth-controls" class="hidden items-center gap-2 sm:gap-3">
+                    <button id="btn-toggle-view" onclick="togglePortalView()" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition flex items-center gap-2">
+                        <i class="fa-solid fa-gauge-high"></i>
+                        <span id="btn-toggle-view-text">Admin Dashboard</span>
+                    </button>
+
+                    <div class="hidden md:flex items-center gap-2.5 pl-3 border-l border-slate-200">
+                        <div class="text-right">
+                            <div id="nav-user-name" class="text-xs font-bold text-slate-900 leading-tight">Yap Soon Keong</div>
+                            <div id="nav-user-role" class="text-[10px] font-semibold uppercase tracking-wider text-blue-600">Super Admin</div>
+                        </div>
+                        <div id="nav-user-avatar" class="w-9 h-9 rounded-full bg-slate-900 text-white font-bold text-xs flex items-center justify-center shadow-sm">
+                            YS
+                        </div>
+                    </div>
+
+                    <button onclick="logoutUser()" title="Sign Out" class="p-2.5 rounded-xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </div>
+
+                <!-- Guest Login Button (Strictly Staff/Admin Login only) -->
+                <div id="nav-guest-controls" class="flex items-center gap-2">
+                    <button onclick="openLoginModal()" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-900 hover:bg-slate-800 text-white shadow-sm transition flex items-center gap-2">
+                        <i class="fa-solid fa-lock text-xs text-blue-400"></i>
+                        <span>Staff / Admin Login</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- =====================================================================
+         VIEW 1: PUBLIC PORTAL (MULTI-PAGE: HOME, SALE, RENT, NEW PROJECTS, READY BUYER, READY TENANT, AGENTS, ABOUT, CONTACT)
+    ====================================================================== -->
+    <main id="view-public" class="flex flex-col min-h-[calc(100vh-4rem)] justify-between">
+        <div>
+            <!-- SUB-PAGE A: HERO SEARCH (SHOWN ON HOME & LISTING/DEMAND PAGES) -->
+            <section id="section-hero" class="relative bg-slate-900 text-white py-12 sm:py-16 px-4 sm:px-6 overflow-visible">
+                <!-- Background Architectural Image & Gradient Overlay -->
+                <div class="absolute inset-0 overflow-hidden pointer-events-none">
+                    <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1920&q=80" alt="Kota Kinabalu Waterfront Real Estate" class="w-full h-full object-cover opacity-30 scale-105">
+                    <div class="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-900/85 to-slate-900"></div>
+                </div>
+
+                <div class="relative max-w-5xl mx-auto text-center z-30">
+                    <span id="page-hero-badge" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-xs font-semibold tracking-wide mb-4">
+                        <i class="fa-solid fa-location-dot text-rose-400"></i>
+                        irumah.my • Premier Real Estate Portal in Kota Kinabalu, Sabah
+                    </span>
+
+                    <h2 id="page-hero-title" class="font-display font-extrabold text-3xl sm:text-5xl tracking-tight leading-[1.12] text-white">
+                        Find Your Ideal Property in <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">Kota Kinabalu</span>
+                    </h2>
+                    <p id="page-hero-subtitle" class="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto mt-3 leading-relaxed">
+                        Explore verified houses, seafront condominiums, apartments, commercial suites, and prime land parcels across Likas, Luyang, Jesselton, and Tanjung Aru on irumah.my.
+                    </p>
+
+                    <!-- Category Quick Switcher Tabs -->
+                    <div class="mt-6 flex flex-wrap items-center justify-center gap-2">
+                        <button type="button" data-pill="home" onclick="navigateToPage('home')" class="hero-cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold bg-blue-600 text-white transition">All Listings</button>
+                        <button type="button" data-pill="sale" onclick="navigateToPage('sale')" class="hero-cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/20 text-slate-200 transition">Property For Sale</button>
+                        <button type="button" data-pill="rent" onclick="navigateToPage('rent')" class="hero-cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/20 text-slate-200 transition">Property For Rent</button>
+                        <button type="button" data-pill="projects" onclick="navigateToPage('projects')" class="hero-cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/20 text-slate-200 transition">New Projects</button>
+                        <button type="button" data-pill="buyer" onclick="navigateToPage('buyer')" class="hero-cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/20 text-slate-200 transition">Ready Buyer</button>
+                        <button type="button" data-pill="tenant" onclick="navigateToPage('tenant')" class="hero-cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/20 text-slate-200 transition">Ready Tenant</button>
+                    </div>
+
+                    <!-- Search Box Card with Live Title Suggestions -->
+                    <div class="mt-6 bg-white rounded-2xl p-3 sm:p-4 shadow-2xl border border-slate-200/80 text-left text-slate-800">
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+                            <!-- Search Input with Autocomplete Dropdown -->
+                            <div class="md:col-span-6 relative">
+                                <label for="filter-search" class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 ml-1">Search Property Title or KK Area</label>
+                                <div class="relative flex items-center">
+                                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 text-slate-400 text-sm"></i>
+                                    <input
+                                        type="text"
+                                        id="filter-search"
+                                        autocomplete="off"
+                                        oninput="handleHeroSearchInput()"
+                                        onfocus="handleHeroSearchInput()"
+                                        placeholder="Type property title (e.g. Likas, Jesselton, Damai)..."
+                                        class="w-full pl-10 pr-9 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 focus:ring-2 focus:ring-blue-600/15 text-sm font-medium outline-none transition"
+                                    >
+                                    <button type="button" id="btn-clear-search" onclick="clearSearchInput()" class="hidden absolute right-3 text-slate-400 hover:text-slate-700 text-xs">
+                                        <i class="fa-solid fa-circle-xmark"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Live Suggested Property Titles Dropdown -->
+                                <div id="search-suggestions-dropdown" class="hidden absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden z-50">
+                                    <div class="px-3.5 py-2 bg-slate-50 border-b border-slate-100 flex items-center justify-between text-[11px] font-bold text-slate-500">
+                                        <span>Suggested Matching Properties</span>
+                                        <span id="suggestion-match-count" class="text-blue-600">0 matches</span>
+                                    </div>
+                                    <ul id="search-suggestions-list" class="max-h-64 overflow-y-auto divide-y divide-slate-100">
+                                        <!-- Populated dynamically while typing -->
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Property Type Filter -->
+                            <div class="md:col-span-3">
+                                <label for="filter-type" class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 ml-1">Property Type</label>
+                                <select id="filter-type" onchange="applyFilters()" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 text-sm font-semibold text-slate-700 outline-none">
+                                    <option value="ALL">All Property Types</option>
+                                    <option value="House">House</option>
+                                    <option value="Condominium">Condominium</option>
+                                    <option value="Apartment">Apartment</option>
+                                    <option value="Commercial">Commercial</option>
+                                    <option value="Land">Land</option>
+                                </select>
+                            </div>
+
+                            <!-- Price / Budget Filter -->
+                            <div class="md:col-span-3">
+                                <label for="filter-price" class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 ml-1">Price / Budget Range</label>
+                                <select id="filter-price" onchange="applyFilters()" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-600 text-sm font-semibold text-slate-700 outline-none">
+                                    <option value="ALL">Any Price / Budget</option>
+                                    <option value="0-10000">Under RM 10,000 (Rent)</option>
+                                    <option value="10000-800000">RM 10K – RM 800K</option>
+                                    <option value="800000-1500000">RM 800K – RM 1.5M</option>
+                                    <option value="1500000-3000000">RM 1.5M – RM 3.0M</option>
+                                    <option value="3000000-999999999">Above RM 3.0M</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Quick Area Tags -->
+                        <div class="mt-3 pt-2.5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                <span class="text-slate-400 font-semibold text-[11px]">Popular KK Areas:</span>
+                                <button type="button" onclick="quickSearchKeyword('Likas')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-600 font-semibold text-[11px] transition">Likas</button>
+                                <button type="button" onclick="quickSearchKeyword('Luyang')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-600 font-semibold text-[11px] transition">Luyang</button>
+                                <button type="button" onclick="quickSearchKeyword('Jesselton')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-600 font-semibold text-[11px] transition">Jesselton</button>
+                                <button type="button" onclick="quickSearchKeyword('Tanjung Aru')" class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-700 text-slate-600 font-semibold text-[11px] transition">Tanjung Aru</button>
+                            </div>
+                            <button type="button" onclick="resetFilters()" class="text-[11px] font-bold text-blue-600 hover:text-blue-800 transition">
+                                Reset Search & Filters
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SUB-PAGE B: GOOGLE MAP & PROPERTY LISTING CARDS (50/50 HALF-MAP SPLIT ON SALE, RENT, PROJECTS, BUYER, TENANT; STACKED ON HOME) -->
+            <section id="section-map-listings" class="py-8 sm:py-10 px-4 sm:px-6 lg:px-8 max-w-[1920px] w-full mx-auto">
+                <!-- Section Header -->
+                <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+                    <div>
+                        <span id="section-map-kicker" class="text-xs font-bold uppercase tracking-wider text-blue-600">Interactive Map & Directory</span>
+                        <h2 id="section-map-heading" class="font-display font-extrabold text-2xl sm:text-3xl text-slate-900 mt-1">
+                            Kota Kinabalu Property Map & Listings
+                        </h2>
+                        <p id="section-map-subheading" class="text-sm text-slate-500 mt-1">Click any price marker on Google Maps or select a card below to inspect full details.</p>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <span id="listing-count-badge" class="text-xs font-bold text-slate-700 bg-white border border-slate-200 px-3.5 py-2 rounded-xl shadow-2xs">
+                            0 Listings in KK
+                        </span>
+                        <button onclick="resetMapToKK()" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 transition flex items-center gap-1.5" title="Center map back to Kota Kinabalu">
+                            <i class="fa-solid fa-location-crosshairs"></i>
+                            <span>Reset Map to Kota Kinabalu</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mobile View Switcher (Listing Cards vs Google Map on Small Screens) -->
+                <div id="mobile-split-toggle" class="hidden lg:hidden mb-4 p-1 bg-slate-200/80 rounded-xl grid grid-cols-2 gap-1">
+                    <button type="button" id="btn-mobile-cards" onclick="setMobileSplitMode('cards')" class="py-2 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-2xs transition">
+                        <i class="fa-solid fa-grip mr-1.5 text-blue-600"></i>Listing Cards
+                    </button>
+                    <button type="button" id="btn-mobile-map" onclick="setMobileSplitMode('map')" class="py-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition">
+                        <i class="fa-solid fa-map-location-dot mr-1.5 text-blue-600"></i>Google Map
+                    </button>
+                </div>
+
+                <!-- Split Wrapper: Full stacked on Home; 50% Left Listing Cards + 50% Right Sticky Google Map on Sale, Rent, Projects, Buyer, Tenant -->
+                <div id="map-listings-split-container" class="flex flex-col gap-8">
+                    <!-- Interactive Google Map Panel -->
+                    <div id="map-panel" class="w-full h-[420px] sm:h-[480px] rounded-2xl overflow-hidden border border-slate-200 shadow-md relative bg-slate-200">
+                        <div id="kk-map" class="w-full h-full z-10"></div>
+
+                        <!-- Floating Coordinates Badge -->
+                        <div class="absolute bottom-4 left-4 z-20 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-xl shadow-md border border-slate-200/80 flex items-center gap-2 pointer-events-auto">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span class="text-xs font-semibold text-slate-700">Kota Kinabalu, Sabah (5.9804° N, 116.0735° E)</span>
+                        </div>
+
+                        <!-- Fallback Banner if Google Maps API key has domain restriction -->
+                        <div id="gmaps-fallback-banner" class="hidden absolute inset-0 z-30 bg-slate-900/90 text-white p-6 flex-col items-center justify-center text-center">
+                            <i class="fa-solid fa-triangle-exclamation text-amber-400 text-3xl mb-3"></i>
+                            <h4 class="font-display font-bold text-lg">Google Maps API Notice</h4>
+                            <p id="gmaps-fallback-reason" class="text-xs text-slate-300 max-w-md mt-1"></p>
+                        </div>
+                    </div>
+
+                    <!-- Listings Column Wrapper -->
+                    <div id="cards-panel" class="w-full">
+                        <!-- Property / Demand Listing Cards Grid -->
+                        <div id="properties-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- Property Cards injected dynamically via JS -->
+                        </div>
+
+                        <!-- Empty Filter State -->
+                        <div id="empty-listings-state" class="hidden flex-col items-center justify-center py-16 text-center bg-white rounded-2xl border border-slate-200">
+                            <div class="w-16 h-16 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center text-2xl mb-4">
+                                <i class="fa-solid fa-house-circle-xmark"></i>
+                            </div>
+                            <h3 class="font-display font-bold text-lg text-slate-800">No matching records found in this category</h3>
+                            <p class="text-sm text-slate-500 max-w-sm mt-1">Try adjusting your property type, budget range, or search keywords in Kota Kinabalu.</p>
+                            <button onclick="resetFilters()" class="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition">
+                                Clear All Filters
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SUB-PAGE C: AGENTS PAGE -->
+            <section id="section-agents" class="hidden bg-white py-14 sm:py-20 px-4 sm:px-6 lg:px-8">
+                <div class="max-w-7xl mx-auto">
+                    <div class="text-center max-w-2xl mx-auto mb-12">
+                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-600">Trusted Advisory Team</span>
+                        <h2 class="font-display font-extrabold text-2xl sm:text-4xl text-slate-900 mt-1">
+                            Meet Our Kota Kinabalu Agents
+                        </h2>
+                        <p class="text-sm text-slate-500 mt-2">
+                            All negotiators on <span class="font-semibold lowercase text-slate-700">irumah.my</span> are verified and registered by our Super Admin to ensure transparent, reliable property transactions across Sabah.
+                        </p>
+                    </div>
+
+                    <!-- Dynamic Agents Grid -->
+                    <div id="public-agents-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Agent cards populated dynamically from Supabase -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- SUB-PAGE D: ABOUT PAGE -->
+            <section id="section-about" class="hidden bg-white py-14 sm:py-20 px-4 sm:px-6 lg:px-8">
+                <div class="max-w-6xl mx-auto">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-blue-600 lowercase">about irumah.my</span>
+                            <h2 class="font-display font-extrabold text-3xl sm:text-4xl text-slate-900 mt-2 leading-tight">
+                                Sabah's Dedicated Property & Demand Matching Network
+                            </h2>
+                            <p class="text-sm text-slate-600 leading-relaxed mt-4">
+                                Headquartered in Kota Kinabalu, <span class="font-semibold text-slate-800 lowercase">irumah.my</span> connects property owners, developers, ready buyers, and verified corporate tenants through an interactive map-driven real estate platform.
+                            </p>
+                            <p class="text-sm text-slate-600 leading-relaxed mt-3">
+                                Every listing and negotiator on <span class="font-semibold text-slate-800 lowercase">irumah.my</span> is vetted and managed centrally by our Principal & Super Admin team—eliminating duplicate spam listings and ensuring accurate land size, built-up area, and pricing intelligence.
+                            </p>
+
+                            <div class="grid grid-cols-3 gap-4 mt-8 pt-6 border-t border-slate-200">
+                                <div>
+                                    <div class="font-display font-extrabold text-2xl text-blue-600">100%</div>
+                                    <div class="text-xs font-semibold text-slate-500 mt-0.5">Verified Agents</div>
+                                </div>
+                                <div>
+                                    <div class="font-display font-extrabold text-2xl text-slate-900">5 Sectors</div>
+                                    <div class="text-xs font-semibold text-slate-500 mt-0.5">Sale, Rent & Demand</div>
+                                </div>
+                                <div>
+                                    <div class="font-display font-extrabold text-2xl text-emerald-600">KK Focus</div>
+                                    <div class="text-xs font-semibold text-slate-500 mt-0.5">Sabah Market Experts</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="rounded-2xl overflow-hidden shadow-lg border border-slate-200 h-64">
+                                <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=80" alt="Kota Kinabalu Commercial District" class="w-full h-full object-cover">
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+                                    <i class="fa-solid fa-map-location-dot text-blue-600 text-xl mb-2"></i>
+                                    <h3 class="font-display font-bold text-sm text-slate-900">Geo-Pinned Accuracy</h3>
+                                    <p class="text-xs text-slate-500 mt-1">Every sale listing, new launch, and buyer requirement is mapped across Kota Kinabalu.</p>
+                                </div>
+                                <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
+                                    <i class="fa-solid fa-handshake text-emerald-600 text-xl mb-2"></i>
+                                    <h3 class="font-display font-bold text-sm text-slate-900">Ready Buyer & Tenant Matching</h3>
+                                    <p class="text-xs text-slate-500 mt-1">Direct visibility into pre-qualified buyers and tenants actively seeking KK properties.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SUB-PAGE E: CONTACT PAGE -->
+            <section id="section-contact" class="hidden bg-slate-50 py-14 sm:py-20 px-4 sm:px-6 lg:px-8">
+                <div class="max-w-6xl mx-auto">
+                    <div class="text-center max-w-2xl mx-auto mb-12">
+                        <span class="text-xs font-bold uppercase tracking-wider text-blue-600">Get In Touch</span>
+                        <h2 class="font-display font-extrabold text-3xl sm:text-4xl text-slate-900 mt-1">
+                            Contact <span class="lowercase text-blue-600">irumah.my</span> Kota Kinabalu
+                        </h2>
+                        <p class="text-sm text-slate-500 mt-2">
+                            Reach out to schedule a property viewing, submit a buying/leasing requirement, or connect with an authorized REN negotiator.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                        <!-- Office Info Cards -->
+                        <div class="lg:col-span-2 space-y-4">
+                            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs">
+                                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-3">
+                                    <i class="fa-solid fa-building"></i>
+                                </div>
+                                <h3 class="font-display font-bold text-base text-slate-900">Kota Kinabalu Headquarters</h3>
+                                <p class="text-xs text-slate-500 leading-relaxed mt-1">
+                                    Suite 8-02, KK Times Square, Coastal Highway, 88100 Kota Kinabalu, Sabah, Malaysia
+                                </p>
+                            </div>
+
+                            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs">
+                                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3">
+                                    <i class="fa-solid fa-phone-volume"></i>
+                                </div>
+                                <h3 class="font-display font-bold text-base text-slate-900">Direct Advisory Desk</h3>
+                                <p class="text-xs text-slate-600 mt-1 font-semibold">+60 88-254 890 / +60 12-802 8899</p>
+                                <p class="text-xs text-slate-500 mt-0.5">Email: yapsoonkeong@outlook.com</p>
+                            </div>
+
+                            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-2xs">
+                                <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-3">
+                                    <i class="fa-solid fa-clock"></i>
+                                </div>
+                                <h3 class="font-display font-bold text-base text-slate-900">Operating Hours</h3>
+                                <p class="text-xs text-slate-500 mt-1">Monday – Saturday: 9:00 AM – 6:00 PM (MYT)</p>
+                                <p class="text-xs text-slate-400 mt-0.5">Sunday & Public Holidays: By Appointment</p>
+                            </div>
+                        </div>
+
+                        <!-- Inquiry Form -->
+                        <div class="lg:col-span-3 bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs">
+                            <h3 class="font-display font-bold text-xl text-slate-900">Send Us an Inquiry</h3>
+                            <p class="text-xs text-slate-500 mt-1">Our Kota Kinabalu desk will route your message to the right specialist.</p>
+
+                            <form onsubmit="handleContactFormSubmit(event)" class="mt-6 space-y-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Full Name *</label>
+                                        <input type="text" id="contact-name" required placeholder="Your name" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-blue-600 text-sm outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Phone / WhatsApp *</label>
+                                        <input type="text" id="contact-phone" required placeholder="+60 12-..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-blue-600 text-sm outline-none">
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Email Address *</label>
+                                        <input type="email" id="contact-email" required placeholder="you@example.com" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-blue-600 text-sm outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Inquiry Topic</label>
+                                        <select id="contact-topic" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-blue-600 text-sm font-medium outline-none bg-white">
+                                            <option value="Property For Sale">Property For Sale</option>
+                                            <option value="Property For Rent">Property For Rent</option>
+                                            <option value="New Projects">New Projects</option>
+                                            <option value="Ready Buyer">Register Ready Buyer Requirement</option>
+                                            <option value="Ready Tenant">Register Ready Tenant Requirement</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Message / Preferred KK Area *</label>
+                                    <textarea id="contact-message" rows="4" required placeholder="Tell us your preferred location in Kota Kinabalu, budget, or property details..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-blue-600 text-sm outline-none"></textarea>
+                                </div>
+
+                                <button type="submit" class="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md shadow-blue-600/20 transition flex items-center gap-2">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                    <span>Submit Inquiry</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- GLOBAL FOOTER -->
+        <footer id="section-footer" class="bg-slate-950 text-slate-300 pt-14 pb-8 px-4 sm:px-6 lg:px-8 border-t border-slate-800">
+            <div class="max-w-7xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-slate-800/80">
+                    <!-- Brand Column (lowercase irumah.my) -->
+                    <div class="lg:col-span-1">
+                        <div class="flex items-center gap-3 cursor-pointer" onclick="navigateToPage('home')">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white shadow-md">
+                                <i class="fa-solid fa-house-chimney text-lg"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-display font-extrabold text-xl text-white leading-none lowercase">
+                                    irumah<span class="text-blue-500">.my</span>
+                                </h3>
+                                <p class="text-[11px] font-medium text-slate-400 tracking-wide mt-0.5">KOTA KINABALU REALTY</p>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-400 leading-relaxed mt-4">
+                            <span class="lowercase text-slate-300 font-semibold">irumah.my</span> is Sabah's dedicated property listing and interactive mapping platform covering sales, rentals, new launches, and ready buyers/tenants in Kota Kinabalu.
+                        </p>
+                    </div>
+
+                    <!-- Portal Pages -->
+                    <div>
+                        <h4 class="font-display font-bold text-sm text-white uppercase tracking-wider mb-4">Property Channels</h4>
+                        <ul class="space-y-2.5 text-xs text-slate-400">
+                            <li><button type="button" onclick="navigateToPage('sale')" class="hover:text-white transition flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-blue-500"></i> Property For Sale</button></li>
+                            <li><button type="button" onclick="navigateToPage('rent')" class="hover:text-white transition flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-blue-500"></i> Property For Rent</button></li>
+                            <li><button type="button" onclick="navigateToPage('projects')" class="hover:text-white transition flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-blue-500"></i> New Projects</button></li>
+                            <li><button type="button" onclick="navigateToPage('buyer')" class="hover:text-white transition flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-blue-500"></i> Ready Buyer</button></li>
+                            <li><button type="button" onclick="navigateToPage('tenant')" class="hover:text-white transition flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] text-blue-500"></i> Ready Tenant</button></li>
+                        </ul>
+                    </div>
+
+                    <!-- Company Navigation -->
+                    <div>
+                        <h4 class="font-display font-bold text-sm text-white uppercase tracking-wider mb-4">Company</h4>
+                        <ul class="space-y-2.5 text-xs text-slate-400">
+                            <li><button type="button" onclick="navigateToPage('agents')" class="hover:text-white transition">Agents Directory</button></li>
+                            <li><button type="button" onclick="navigateToPage('about')" class="hover:text-white transition lowercase">about irumah.my</button></li>
+                            <li><button type="button" onclick="navigateToPage('contact')" class="hover:text-white transition">Contact Us</button></li>
+                            <li><button type="button" onclick="openLoginModal()" class="hover:text-white transition flex items-center gap-1.5"><i class="fa-solid fa-lock text-[10px] text-blue-500"></i> Super Admin & Agent Portal</button></li>
+                        </ul>
+                    </div>
+
+                    <!-- Headquarters Contact -->
+                    <div>
+                        <h4 class="font-display font-bold text-sm text-white uppercase tracking-wider mb-4">KK Headquarters</h4>
+                        <ul class="space-y-3 text-xs text-slate-400">
+                            <li class="flex items-start gap-2.5">
+                                <i class="fa-solid fa-location-dot text-blue-500 mt-0.5"></i>
+                                <span>Suite 8-02, KK Times Square, Coastal Highway, 88100 Kota Kinabalu, Sabah, Malaysia</span>
+                            </li>
+                            <li class="flex items-center gap-2.5">
+                                <i class="fa-solid fa-phone text-blue-500"></i>
+                                <span>+60 88-254 890 / +60 12-802 8899</span>
+                            </li>
+                            <li class="flex items-center gap-2.5">
+                                <i class="fa-solid fa-envelope text-blue-500"></i>
+                                <span>yapsoonkeong@outlook.com</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Copyright Bar -->
+                <div class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+                    <p>&copy; 2026 <span class="lowercase text-slate-400 font-semibold">irumah.my</span> (Kota Kinabalu). All rights reserved.</p>
+                    <p>Authorized Agent Registration Managed by Super Admin</p>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <!-- =====================================================================
+         VIEW 2: ADMIN & AGENT DASHBOARD PORTAL
+    ====================================================================== -->
+    <main id="view-dashboard" class="hidden min-h-[calc(100vh-4rem)] bg-slate-50 py-6 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <!-- Dashboard Top Banner -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 mb-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <div class="flex items-center gap-2.5">
+                        <span id="dash-role-badge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">
+                            Super Admin
+                        </span>
+                        <span class="text-xs text-slate-400">• <span class="lowercase font-semibold text-slate-600">irumah.my</span> Kota Kinabalu HQ (Supabase Live Sync)</span>
+                    </div>
+                    <h2 class="font-display font-extrabold text-2xl text-slate-900 mt-1">
+                        Welcome back, <span id="dash-welcome-name">Yap Soon Keong</span>
+                    </h2>
+                    <p class="text-sm text-slate-500 mt-0.5">Manage property listings, map coordinates, and authorized real estate agents on <span class="lowercase font-medium">irumah.my</span>.</p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <button onclick="verifyAgentsTableConnection(true)" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-indigo-700 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-database"></i>
+                        <span>Check Agents Table</span>
+                    </button>
+                    <button onclick="syncFromSupabase(true)" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-blue-600 bg-slate-100 hover:bg-blue-50 border border-slate-200 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        <span>Refresh Supabase</span>
+                    </button>
+                    <button onclick="switchMainView('public')" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-white transition flex items-center gap-2">
+                        <i class="fa-solid fa-map-location-dot"></i>
+                        <span>View Public Portal</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Overview Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Listings</p>
+                        <p id="stat-total-properties" class="font-display font-extrabold text-2xl text-slate-900 mt-1">0</p>
+                    </div>
+                    <div class="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-building"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Portfolio Value</p>
+                        <p id="stat-total-value" class="font-display font-extrabold text-2xl text-slate-900 mt-1">RM 0</p>
+                    </div>
+                    <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-sack-dollar"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Registered Agents</p>
+                        <p id="stat-total-agents" class="font-display font-extrabold text-2xl text-slate-900 mt-1">0</p>
+                    </div>
+                    <div class="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Default Region</p>
+                        <p class="font-display font-extrabold text-lg text-slate-900 mt-1">Kota Kinabalu</p>
+                    </div>
+                    <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-map-pin"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Tabs Navigation -->
+            <div class="flex items-center justify-between border-b border-slate-200 mb-6">
+                <div class="flex gap-2">
+                    <button id="tab-btn-properties" onclick="switchDashboardTab('properties')" class="px-5 py-3 text-sm font-bold border-b-2 border-blue-600 text-blue-600 flex items-center gap-2 transition">
+                        <i class="fa-solid fa-house-chimney"></i>
+                        <span>Property Listings</span>
+                    </button>
+                    <button id="tab-btn-agents" onclick="switchDashboardTab('agents')" class="px-5 py-3 text-sm font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 flex items-center gap-2 transition">
+                        <i class="fa-solid fa-users-gear"></i>
+                        <span>Agents Management</span>
+                        <span class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold">Super Admin</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB 1: PROPERTY LISTINGS MANAGEMENT -->
+            <div id="dash-tab-properties" class="animate-fade-in">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                    <div>
+                        <h3 class="font-display font-bold text-lg text-slate-900">All Property Listings</h3>
+                        <p class="text-xs text-slate-500">Add new properties or update existing listings and map coordinates.</p>
+                    </div>
+                    <button onclick="openPropertyFormModal()" class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-sm shadow-blue-600/20 flex items-center gap-2 self-start sm:self-auto transition">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Add New Property</span>
+                    </button>
+                </div>
+
+                <!-- Properties Table -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                                    <th class="py-3.5 px-4">Property</th>
+                                    <th class="py-3.5 px-4">Type</th>
+                                    <th class="py-3.5 px-4">Price (MYR)</th>
+                                    <th class="py-3.5 px-4">Specs & Area</th>
+                                    <th class="py-3.5 px-4">Assigned Agent</th>
+                                    <th class="py-3.5 px-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-properties-tbody" class="divide-y divide-slate-100 text-sm">
+                                <!-- Rows injected via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: AGENTS MANAGEMENT (SUPER ADMIN ONLY) -->
+            <div id="dash-tab-agents" class="hidden animate-fade-in">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                    <div>
+                        <h3 class="font-display font-bold text-lg text-slate-900">Registered Real Estate Agents</h3>
+                        <p class="text-xs text-slate-500">Only Super Admin can register new agent accounts or edit agent credentials.</p>
+                    </div>
+                    <button onclick="openAgentFormModal()" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold shadow-sm shadow-indigo-600/20 flex items-center gap-2 self-start sm:self-auto transition">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span>Register New Agent</span>
+                    </button>
+                </div>
+
+                <!-- Agents Table -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                                    <th class="py-3.5 px-4">Agent Name & Email</th>
+                                    <th class="py-3.5 px-4">Role & License</th>
+                                    <th class="py-3.5 px-4">Contact & Credentials</th>
+                                    <th class="py-3.5 px-4">Assigned Listings</th>
+                                    <th class="py-3.5 px-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-agents-tbody" class="divide-y divide-slate-100 text-sm">
+                                <!-- Rows injected via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- =====================================================================
+         MODAL 1: STAFF / ADMIN LOGIN MODAL (NO PUBLIC REGISTRATION)
+    ====================================================================== -->
+    <div id="modal-login" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-100 animate-fade-in relative">
+            <button onclick="closeLoginModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center text-xl mb-4 shadow-md shadow-blue-600/20">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <h3 class="font-display font-extrabold text-xl text-slate-900">Authorized Portal Login</h3>
+            <p class="text-xs text-slate-500 mt-1">Public registration is disabled on <span class="lowercase font-semibold text-slate-700">irumah.my</span>. Please sign in with credentials issued by the Super Admin.</p>
+
+            <!-- Quick Fill Helper for Super Admin Testing -->
+            <div class="mt-4 p-3 rounded-xl bg-blue-50/80 border border-blue-100 flex items-center justify-between gap-2">
+                <div class="text-[11px] text-blue-900">
+                    <span class="font-bold block">Super Admin Account:</span>
+                    <span class="font-mono">yapsoonkeong@outlook.com</span>
+                </div>
+                <button type="button" onclick="fillSuperAdminCredentials()" class="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-semibold rounded-lg shrink-0 transition">
+                    Auto-Fill
+                </button>
+            </div>
+
+            <form onsubmit="handleLoginSubmit(event)" class="mt-5 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Email Address</label>
+                    <input type="email" id="login-email" required placeholder="yapsoonkeong@outlook.com" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 text-sm outline-none transition">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Password</label>
+                    <input type="password" id="login-password" required placeholder="••••••" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/20 text-sm outline-none transition">
+                </div>
+
+                <div id="login-error-msg" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium">
+                    Invalid email or password.
+                </div>
+
+                <button type="submit" class="w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm shadow-md transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span>Sign In to Dashboard</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         MODAL 2: PROPERTY DETAILS MODAL (PUBLIC VIEW)
+    ====================================================================== -->
+    <div id="modal-property-detail" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/65 backdrop-blur-xs p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-3xl w-full overflow-hidden shadow-2xl border border-slate-100 animate-fade-in my-auto relative">
+            <button onclick="closePropertyDetailModal()" class="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-slate-900/70 hover:bg-slate-900 text-white flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div id="property-detail-content">
+                <!-- Populated dynamically via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         MODAL 3: ADD / EDIT PROPERTY MODAL (ADMIN & AGENT)
+    ====================================================================== -->
+    <div id="modal-property-form" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/65 backdrop-blur-xs p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-3xl w-full p-6 sm:p-7 shadow-2xl border border-slate-100 animate-fade-in my-auto relative max-h-[92vh] overflow-y-auto">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-200">
+                <div>
+                    <h3 id="prop-form-title" class="font-display font-extrabold text-xl text-slate-900">Add New Property</h3>
+                    <p class="text-xs text-slate-500">Complete property specifications and pin its exact location in Kota Kinabalu.</p>
+                </div>
+                <button onclick="closePropertyFormModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handlePropertyFormSubmit(event)" class="mt-5 space-y-4">
+                <input type="hidden" id="prop-form-id">
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Property Name *</label>
+                        <input type="text" id="prop-form-name" required placeholder="e.g. Jesselton Twin Towers Residence" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-blue-600 text-sm outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Listing Category *</label>
+                        <select id="prop-form-category" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-blue-600 text-sm font-medium outline-none bg-white">
+                            <option value="Property For Sale">Property For Sale</option>
+                            <option value="Property For Rent">Property For Rent</option>
+                            <option value="New Projects">New Projects</option>
+                            <option value="Ready Buyer">Ready Buyer</option>
+                            <option value="Ready Tenant">Ready Tenant</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Property Type *</label>
+                        <select id="prop-form-type" onchange="toggleResidentialFields()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-blue-600 text-sm font-medium outline-none bg-white">
+                            <option value="House">House</option>
+                            <option value="Condominium">Condominium</option>
+                            <option value="Apartment">Apartment</option>
+                            <option value="Commercial">Commercial</option>
+                            <option value="Land">Land</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Conditional Residential Fields: Bedrooms & Bathrooms (Only for House, Condominium, Apartment) -->
+                <div id="prop-residential-fields" class="grid grid-cols-2 gap-4 p-3.5 rounded-xl bg-blue-50/70 border border-blue-100">
+                    <div>
+                        <label class="block text-xs font-bold text-blue-900 uppercase tracking-wider mb-1">
+                            <i class="fa-solid fa-bed mr-1"></i> Bedrooms *
+                        </label>
+                        <input type="number" id="prop-form-bedrooms" min="0" max="20" value="3" class="w-full px-3.5 py-2 rounded-xl border border-blue-200 bg-white focus:border-blue-600 text-sm outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-blue-900 uppercase tracking-wider mb-1">
+                            <i class="fa-solid fa-bath mr-1"></i> Bathrooms *
+                        </label>
+                        <input type="number" id="prop-form-bathrooms" min="0" max="20" value="2" class="w-full px-3.5 py-2 rounded-xl border border-blue-200 bg-white focus:border-blue-600 text-sm outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Price (MYR) *</label>
+                        <input type="number" id="prop-form-price" required min="1" step="any" placeholder="e.g. 1250000" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-blue-600 text-sm outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Land Size (sq ft) *</label>
+                        <input type="number" id="prop-form-land" required min="1" step="any" placeholder="e.g. 3200" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-blue-600 text-sm outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Built-up Area (sq ft) *</label>
+                        <input type="number" id="prop-form-buildup" required min="0" step="any" placeholder="e.g. 2400" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-blue-600 text-sm outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Location / Neighborhood *</label>
+                        <input type="text" id="prop-form-location" required placeholder="e.g. Likas Bay, Kota Kinabalu, Sabah" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-blue-600 text-sm outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Assigned Agent *</label>
+                        <select id="prop-form-agent" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-blue-600 text-sm font-medium outline-none bg-white">
+                            <!-- Agents populated via JS -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Interactive Mini-Map Coordinate Picker -->
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                        <label class="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                            <i class="fa-solid fa-map-pin text-rose-500 mr-1"></i> Pin Property Location on Kota Kinabalu Google Map
+                        </label>
+                        <span class="text-[11px] text-slate-500">Click anywhere or drag pin to set coordinates</span>
+                    </div>
+                    <div id="picker-map" class="w-full h-48 rounded-xl border border-slate-300 mb-2.5 z-10 bg-slate-200"></div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-500 mb-0.5">Latitude</label>
+                            <input type="number" step="any" id="prop-form-lat" required value="5.9804" onchange="syncPickerMarkerFromInputs()" class="w-full px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-500 mb-0.5">Longitude</label>
+                            <input type="number" step="any" id="prop-form-lng" required value="116.0735" onchange="syncPickerMarkerFromInputs()" class="w-full px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-mono">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image URL + Quick Architectural Presets -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Property Photo URL *</label>
+                    <input type="url" id="prop-form-image" required placeholder="https://images.unsplash.com/..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-blue-600 text-sm outline-none">
+                    <div class="flex flex-wrap items-center gap-1.5 mt-2">
+                        <span class="text-[11px] font-medium text-slate-500">Quick Presets:</span>
+                        <button type="button" onclick="setPresetImage('https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=900&q=80')" class="text-[11px] px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700">Luxury Villa</button>
+                        <button type="button" onclick="setPresetImage('https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=900&q=80')" class="text-[11px] px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700">Seafront Condo</button>
+                        <button type="button" onclick="setPresetImage('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=900&q=80')" class="text-[11px] px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700">Modern House</button>
+                        <button type="button" onclick="setPresetImage('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=900&q=80')" class="text-[11px] px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700">Commercial Tower</button>
+                        <button type="button" onclick="setPresetImage('https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=900&q=80')" class="text-[11px] px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700">Sabah Land</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Property Description</label>
+                    <textarea id="prop-form-desc" rows="3" placeholder="Highlight key features, sea view, proximity to KKIA, Imago Mall, or Queen Elizabeth Hospital..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-blue-600 text-sm outline-none"></textarea>
+                </div>
+
+                <div class="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-200">
+                    <button type="button" onclick="closePropertyFormModal()" class="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">Cancel</button>
+                    <button type="submit" id="btn-save-property" class="px-5 py-2.5 rounded-xl text-sm font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition">
+                        Save to Supabase
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         MODAL 4: ADD / EDIT AGENT MODAL (SUPER ADMIN ONLY)
+    ====================================================================== -->
+    <div id="modal-agent-form" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/65 backdrop-blur-xs p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-100 animate-fade-in relative">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-200">
+                <div>
+                    <h3 id="agent-form-title" class="font-display font-extrabold text-xl text-slate-900">Register New Agent</h3>
+                    <p class="text-xs text-slate-500">Create or update an authorized real estate agent account on <span class="lowercase font-medium">irumah.my</span>.</p>
+                </div>
+                <button onclick="closeAgentFormModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleAgentFormSubmit(event)" class="mt-5 space-y-4">
+                <input type="hidden" id="agent-form-id">
+                <input type="hidden" id="agent-form-avatar">
+
+                <!-- Agent Profile Image Upload & Preview -->
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row items-center gap-4">
+                    <div id="agent-avatar-preview-box" class="w-16 h-16 rounded-2xl bg-indigo-600 text-white font-display font-extrabold text-xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-200 shadow-xs">
+                        <span id="agent-avatar-initials">AG</span>
+                        <img id="agent-avatar-preview-img" src="" alt="Agent Preview" class="hidden w-full h-full object-cover" onerror="handleAgentPreviewImgError()">
+                    </div>
+
+                    <div class="flex-1 w-full space-y-2">
+                        <div class="flex items-center justify-between gap-2">
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Agent Profile Photo</label>
+                            <button type="button" onclick="clearAgentAvatar()" class="text-[11px] font-semibold text-rose-600 hover:text-rose-700">
+                                Remove Photo
+                            </button>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-2">
+                            <label class="cursor-pointer px-3 py-1.5 rounded-lg bg-white hover:bg-indigo-50 text-indigo-700 border border-indigo-200 text-xs font-semibold transition inline-flex items-center gap-1.5">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                                <span>Upload Image</span>
+                                <input type="file" id="agent-form-file" accept="image/*" onchange="handleAgentImageUpload(event)" class="hidden">
+                            </label>
+                            <input type="text" id="agent-form-avatar-url" oninput="handleAgentAvatarUrlInput()" placeholder="Or paste image URL (https://...)" class="flex-1 min-w-[180px] px-3 py-1.5 rounded-lg border border-slate-300 bg-white focus:border-indigo-600 text-xs outline-none">
+                        </div>
+                        <p id="agent-upload-status" class="text-[11px] text-slate-500">Supports PNG, JPG, WEBP (auto-resized to max 400px for fast sync).</p>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Agent Full Name *</label>
+                    <input type="text" id="agent-form-name" required oninput="refreshAgentAvatarPreview()" placeholder="e.g. Michelle Wong" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-600 text-sm outline-none">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Email (Login ID) *</label>
+                        <input type="email" id="agent-form-email" required placeholder="michelle@irumah.my" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-600 text-sm outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Login Password *</label>
+                        <input type="text" id="agent-form-password" required placeholder="Set agent password" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-600 text-sm outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Phone / WhatsApp *</label>
+                        <input type="text" id="agent-form-phone" required placeholder="+60 16-831 9920" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-600 text-sm outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">REN License Tag *</label>
+                        <input type="text" id="agent-form-ren" required placeholder="REN 45812" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-indigo-600 text-sm outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Role</label>
+                    <input type="text" id="agent-form-role-display" disabled value="Agent" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-100 text-slate-600 text-sm font-semibold">
+                </div>
+
+                <div class="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-200">
+                    <button type="button" onclick="closeAgentFormModal()" class="px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition">Cancel</button>
+                    <button type="submit" id="btn-save-agent" class="px-5 py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition">
+                        Save Agent Account
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- =====================================================================
+         JAVASCRIPT APPLICATION LOGIC (SUPABASE + GOOGLE MAPS JS API)
+    ====================================================================== -->
+    <script>
+        // 1. SUPABASE CONFIGURATION (Project Ref: kidyxugroracunkkflet)
+        const SUPABASE_URL = 'https://kidyxugroracunkkflet.supabase.co';
+        const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_or_iOsOyVCUAFEvhOGYM6w_tN5IsX1H';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+        // 2. CONSTANTS & DEFAULT KOTA KINABALU COORDINATES
+        const KK_CENTER = { lat: 5.9804, lng: 116.0735 };
+        const KK_DEFAULT_ZOOM = 13;
+        const RESIDENTIAL_TYPES = ['House', 'Condominium', 'Apartment'];
+
+        const STORAGE_KEYS = {
+            SESSION: 'irumah_session_v2'
+        };
+
+        // Fallback Seed Data (used if Supabase tables are still empty or unreachable)
+        const DEFAULT_USERS = [
+            {
+                id: 'usr_superadmin',
+                name: 'Yap Soon Keong',
+                email: 'yapsoonkeong@outlook.com',
+                password: '123456',
+                role: 'Super Admin',
+                phone: '+60 12-802 8899',
+                ren: 'REA E-2190',
+                avatar: ''
+            },
+            {
+                id: 'usr_agent_1',
+                name: 'Sarah Lim',
+                email: 'sarah.lim@irumah.my',
+                password: 'agent123',
+                role: 'Agent',
+                phone: '+60 16-830 4412',
+                ren: 'REN 38291',
+                avatar: ''
+            },
+            {
+                id: 'usr_agent_2',
+                name: 'Daniel Wong',
+                email: 'daniel.wong@irumah.my',
+                password: 'agent123',
+                role: 'Agent',
+                phone: '+60 19-881 7740',
+                ren: 'REN 41055',
+                avatar: ''
+            }
+        ];
+
+        const DEFAULT_PROPERTIES = [
+            {
+                id: 'prop_kk_1',
+                category: 'Property For Sale',
+                name: 'Likas Bay Luxury Semi-D Villa',
+                type: 'House',
+                price: 2680000,
+                bedrooms: 5,
+                bathrooms: 5,
+                landSize: 4200,
+                builtUpArea: 3650,
+                location: 'Likas Bay, Kota Kinabalu, Sabah',
+                lat: 5.9935,
+                lng: 116.0962,
+                image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=900&q=80',
+                agentId: 'usr_agent_1',
+                description: 'Modern 2.5-storey semi-detached residence in prestigious Likas Bay enclave. Minutes away from Likas jogging track, Tshung Tsin Secondary School, and KK city center.'
+            },
+            {
+                id: 'prop_kk_2',
+                category: 'New Projects',
+                name: 'Jesselton Residences Waterfront Condo',
+                type: 'Condominium',
+                price: 1450000,
+                bedrooms: 3,
+                bathrooms: 3,
+                landSize: 1680,
+                builtUpArea: 1680,
+                location: 'KK City Centre, Kota Kinabalu, Sabah',
+                lat: 5.9896,
+                lng: 116.0789,
+                image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=900&q=80',
+                agentId: 'usr_superadmin',
+                description: 'Panoramic South China Sea & Tunku Abdul Rahman Marine Park sunset views. Direct access to Suria Sabah Shopping Mall and Jesselton Point Ferry Terminal.'
+            },
+            {
+                id: 'prop_kk_3',
+                category: 'Property For Rent',
+                name: 'Damai Heights Designer Apartment (For Rent)',
+                type: 'Apartment',
+                price: 3400,
+                bedrooms: 2,
+                bathrooms: 2,
+                landSize: 980,
+                builtUpArea: 980,
+                location: 'Damai, Luyang, Kota Kinabalu',
+                lat: 5.9632,
+                lng: 116.0938,
+                image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=900&q=80',
+                agentId: 'usr_agent_2',
+                description: 'Fully furnished contemporary apartment in vibrant Damai Plaza hub. Walking distance to specialty eateries, KPJ Specialist Hospital, and City Mall.'
+            },
+            {
+                id: 'prop_kk_4',
+                category: 'Ready Buyer',
+                name: 'Ready Cash Buyer Seeking Luyang Corner Terrace',
+                type: 'House',
+                price: 1350000,
+                bedrooms: 4,
+                bathrooms: 3,
+                landSize: 3200,
+                builtUpArea: 2600,
+                location: 'Luyang / Foh Sang, Kota Kinabalu',
+                lat: 5.9668,
+                lng: 116.0885,
+                image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=900&q=80',
+                agentId: 'usr_superadmin',
+                description: 'Pre-approved cash buyer looking for a well-maintained double-storey corner or semi-D home around Luyang, Foh Sang, or Hilltop.'
+            },
+            {
+                id: 'prop_kk_5',
+                category: 'Ready Tenant',
+                name: 'Corporate Expat Tenant Seeking Seafront Condo',
+                type: 'Condominium',
+                price: 4800,
+                bedrooms: 3,
+                bathrooms: 2,
+                landSize: 1450,
+                builtUpArea: 1450,
+                location: 'Tanjung Aru / Sutera Harbour, Kota Kinabalu',
+                lat: 5.9554,
+                lng: 116.0532,
+                image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=900&q=80',
+                agentId: 'usr_agent_1',
+                description: 'Verified corporate tenant on 2-year lease seeking fully furnished 3-bedroom condominium near Tanjung Aru or KK City Centre.'
+            }
+        ];
+
+        // 3. APPLICATION STATE
+        let users = [...DEFAULT_USERS];
+        let properties = [...DEFAULT_PROPERTIES];
+        let isSupabaseSchemaReady = false;
+        let currentUser = null;
+        let currentMainView = 'public'; // 'public' | 'dashboard'
+        let currentPublicPage = 'home'; // 'home' | 'sale' | 'rent' | 'projects' | 'buyer' | 'tenant' | 'agents' | 'about' | 'contact'
+        let currentDashTab = 'properties'; // 'properties' | 'agents'
+
+        // Google Maps Instances
+        let gMap = null;
+        let gInfoWindow = null;
+        let gMarkersMap = {}; // propertyId -> google.maps.Marker
+        let isGoogleMapsReady = false;
+
+        let pickerGMap = null;
+        let pickerGMarker = null;
+
+        // 4. INITIALIZATION
+        window.addEventListener('DOMContentLoaded', async () => {
+            await syncFromSupabase(false);
+
+            // Restore session if user was signed in
+            try {
+                const rawSession = localStorage.getItem(STORAGE_KEYS.SESSION);
+                if (rawSession) {
+                    const parsed = JSON.parse(rawSession);
+                    const found = users.find(u => u.id === parsed.id || u.email.toLowerCase() === (parsed.email || '').toLowerCase());
+                    if (found) {
+                        currentUser = found;
+                        updateAuthUI();
+                    }
+                }
+            } catch (_) {}
+
+            renderPublicListings();
+            renderPublicAgentsSection();
+            applyLayoutModeForPage(currentPublicPage);
+
+            // Close autocomplete dropdown when clicking outside search wrapper
+            document.addEventListener('click', (e) => {
+                const searchInput = document.getElementById('filter-search');
+                const dropdown = document.getElementById('search-suggestions-dropdown');
+                if (searchInput && dropdown && !searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+        });
+
+        // Graceful handler if Google Maps API key has domain referrer/billing restriction
+        window.gm_authFailure = function() {
+            const banner = document.getElementById('gmaps-fallback-banner');
+            const reason = document.getElementById('gmaps-fallback-reason');
+            if (banner && reason) {
+                reason.textContent = 'Google Maps JavaScript API returned an authentication or referrer restriction error for this domain. Ensure your API key allows irumah.my in Google Cloud Console.';
+                banner.classList.remove('hidden');
+                banner.classList.add('flex');
+            }
+            showToast('Google Maps API key restriction detected on this host.', 'error');
+        };
+
+        // Google Maps Callback triggered by Google Maps JS API script tag
+        window.initGoogleMaps = function() {
+            isGoogleMapsReady = true;
+            const mapEl = document.getElementById('kk-map');
+            if (!mapEl) return;
+
+            gMap = new google.maps.Map(mapEl, {
+                center: KK_CENTER,
+                zoom: KK_DEFAULT_ZOOM,
+                mapTypeControl: true,
+                mapTypeControlOptions: {
+                    position: google.maps.ControlPosition.TOP_RIGHT
+                },
+                streetViewControl: true,
+                fullscreenControl: true,
+                styles: [
+                    {
+                        featureType: 'poi.business',
+                        stylers: [{ visibility: 'off' }]
+                    }
+                ]
+            });
+
+            gInfoWindow = new google.maps.InfoWindow({
+                maxWidth: 285
+            });
+
+            updateMapMarkers(getFilteredProperties());
+        };
+
+        // 5. SUPABASE DATA MAPPERS & SYNC
+        function updateDbStatus(state, label) {
+            const pill = document.getElementById('db-status-pill');
+            const dot = document.getElementById('db-status-dot');
+            const text = document.getElementById('db-status-text');
+            if (!pill || !dot || !text) return;
+
+            text.textContent = label;
+            pill.className = 'cursor-pointer hidden sm:inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full border ';
+            dot.className = 'w-2 h-2 rounded-full ';
+
+            if (state === 'connected') {
+                pill.className += 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                dot.className += 'bg-emerald-500';
+            } else if (state === 'error') {
+                pill.className += 'bg-rose-50 text-rose-700 border-rose-200';
+                dot.className += 'bg-rose-500';
+            } else {
+                pill.className += 'bg-amber-50 text-amber-700 border-amber-200';
+                dot.className += 'bg-amber-500 animate-pulse';
+            }
+        }
+
+        async function syncFromSupabase(notify = false) {
+            updateDbStatus('loading', 'Syncing DB...');
+            try {
+                const [agentsRes, propsRes] = await Promise.all([
+                    supabaseClient.from('agents').select('*'),
+                    supabaseClient.from('properties').select('*')
+                ]);
+
+                if (!agentsRes.error && Array.isArray(agentsRes.data) && agentsRes.data.length > 0) {
+                    users = agentsRes.data.map(mapDbAgent);
+                } else {
+                    users = [...DEFAULT_USERS];
+                }
+
+                if (!propsRes.error && Array.isArray(propsRes.data) && propsRes.data.length > 0) {
+                    properties = propsRes.data.map(mapDbProperty);
+                    isSupabaseSchemaReady = true;
+                } else if (!propsRes.error) {
+                    isSupabaseSchemaReady = true;
+                    if (properties.length === 0) properties = [...DEFAULT_PROPERTIES];
+                } else {
+                    isSupabaseSchemaReady = false;
+                    if (properties.length === 0) properties = [...DEFAULT_PROPERTIES];
+                }
+
+                if (currentUser) {
+                    const refreshedMe = users.find(u => u.id === currentUser.id || u.email.toLowerCase() === currentUser.email.toLowerCase());
+                    if (refreshedMe) {
+                        currentUser = refreshedMe;
+                        updateAuthUI();
+                    }
+                }
+
+                renderPublicListings();
+                renderPublicAgentsSection();
+                if (currentMainView === 'dashboard') renderDashboard();
+
+                if (agentsRes.error && propsRes.error) {
+                    updateDbStatus('error', 'DB Table Setup Needed');
+                } else {
+                    updateDbStatus('connected', `Supabase Live (${users.length} Agents)`);
+                    if (notify) showToast('Synced with Supabase database.', 'success');
+                }
+            } catch (err) {
+                console.error('Supabase sync error:', err);
+                updateDbStatus('error', 'Offline / Local Cache');
+                if (notify) showToast(`Sync warning: ${err.message}`, 'error');
+            }
+        }
+
+        async function verifyAgentsTableConnection(notify = true) {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('agents')
+                    .select('id, name, email, role, phone, ren, avatar');
+
+                if (error) {
+                    if (notify) {
+                        showToast(`Agents table check failed (${error.code || 'Error'}): ${error.message}`, 'error');
+                    }
+                    return { connected: false, error, rows: [] };
+                }
+
+                const rows = data || [];
+                const hasSuperAdmin = rows.some(r => (r.email || '').toLowerCase() === 'yapsoonkeong@outlook.com');
+
+                if (notify) {
+                    showToast(
+                        `Connected to public.agents (${rows.length} ${rows.length === 1 ? 'row' : 'rows'}${hasSuperAdmin ? ', Super Admin found' : ', Super Admin missing'}).`,
+                        hasSuperAdmin ? 'success' : 'info'
+                    );
+                }
+                return { connected: true, error: null, rows };
+            } catch (err) {
+                if (notify) {
+                    showToast(`Unable to reach public.agents: ${err.message}`, 'error');
+                }
+                return { connected: false, error: err, rows: [] };
+            }
+        }
+
+        function mapDbAgent(row) {
+            return {
+                id: row.id,
+                name: row.name || 'Unnamed Agent',
+                email: row.email || '',
+                password: row.password || '',
+                role: row.role || 'Agent',
+                phone: row.phone || '',
+                ren: row.ren || '',
+                avatar: row.avatar || ''
+            };
+        }
+
+        function mapDbProperty(row) {
+            return {
+                id: row.id,
+                category: row.category || inferCategoryFromProperty(row),
+                name: row.name,
+                type: row.type,
+                price: Number(row.price || 0),
+                bedrooms: Number(row.bedrooms || 0),
+                bathrooms: Number(row.bathrooms || 0),
+                landSize: Number(row.land_size || 0),
+                builtUpArea: Number(row.built_up_area || 0),
+                location: row.location || 'Kota Kinabalu, Sabah',
+                lat: Number(row.lat || KK_CENTER.lat),
+                lng: Number(row.lng || KK_CENTER.lng),
+                image: row.image || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=900&q=80',
+                agentId: row.agent_id || 'usr_superadmin',
+                description: row.description || ''
+            };
+        }
+
+        function inferCategoryFromProperty(row) {
+            const text = `${row.name || ''} ${row.description || ''}`.toLowerCase();
+            if (text.includes('ready buyer') || text.includes('cash buyer')) return 'Ready Buyer';
+            if (text.includes('ready tenant') || text.includes('expat tenant')) return 'Ready Tenant';
+            if (text.includes('new project') || text.includes('launch') || text.includes('residences')) return 'New Projects';
+            if (text.includes('rent') || Number(row.price || 0) < 25000) return 'Property For Rent';
+            return 'Property For Sale';
+        }
+
+        function toDbProperty(prop) {
+            return {
+                id: prop.id,
+                category: prop.category || 'Property For Sale',
+                name: prop.name,
+                type: prop.type,
+                price: prop.price,
+                bedrooms: prop.bedrooms,
+                bathrooms: prop.bathrooms,
+                land_size: prop.landSize,
+                built_up_area: prop.builtUpArea,
+                location: prop.location,
+                lat: prop.lat,
+                lng: prop.lng,
+                image: prop.image,
+                agent_id: prop.agentId,
+                description: prop.description
+            };
+        }
+
+        // 6. FORMATTING & PAGE ROUTING HELPERS
+        const PAGE_CONFIG = {
+            home: {
+                category: 'ALL',
+                priceLabel: 'Price / Budget',
+                badge: 'irumah.my • Premier Real Estate Portal in Kota Kinabalu, Sabah',
+                title: 'Find Your Ideal Property in <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">Kota Kinabalu</span>',
+                subtitle: 'Explore properties for sale, rentals, new launches, ready buyers, and ready tenants across Kota Kinabalu on irumah.my.',
+                kicker: 'Interactive Map & Directory',
+                heading: 'All Kota Kinabalu Listings & Requirements',
+                subheading: 'Click any price marker on Google Maps or select a card below to inspect full details.'
+            },
+            sale: {
+                category: 'Property For Sale',
+                priceLabel: 'Asking Price',
+                badge: 'Subsale & Direct Owner Listings • irumah.my',
+                title: 'Property For <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">Sale</span> in KK',
+                subtitle: 'Browse landed houses, seafront condominiums, commercial lots, and development land available for purchase in Kota Kinabalu.',
+                kicker: 'Property For Sale',
+                heading: 'Kota Kinabalu Properties For Sale',
+                subheading: 'Explore pinned sale listings on Google Maps with verified land size and built-up specifications.'
+            },
+            rent: {
+                category: 'Property For Rent',
+                priceLabel: 'Monthly Rental',
+                badge: 'Residential & Commercial Leasing • irumah.my',
+                title: 'Property For <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">Rent</span> in KK',
+                subtitle: 'Discover move-in ready apartments, condominiums, family houses, and retail spaces for lease across Kota Kinabalu.',
+                kicker: 'Property For Rent',
+                heading: 'Kota Kinabalu Properties For Rent',
+                subheading: 'Compare monthly rental rates and pin locations across Luyang, Likas, Damai, and KK City Centre.'
+            },
+            projects: {
+                category: 'New Projects',
+                priceLabel: 'Launch Price From',
+                badge: 'Developer Launches & Under-Construction • irumah.my',
+                title: '<span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">New Projects</span> in Kota Kinabalu',
+                subtitle: 'Explore upcoming luxury high-rises, gated landed townships, and waterfront commercial developments in Kota Kinabalu.',
+                kicker: 'New Developer Launches',
+                heading: 'Featured New Projects in Kota Kinabalu',
+                subheading: 'Inspect project sites on Google Maps, floor sizes, and direct developer-appointed agents.'
+            },
+            buyer: {
+                category: 'Ready Buyer',
+                priceLabel: 'Buyer Max Budget',
+                badge: 'Verified Purchaser Requirements • irumah.my',
+                title: '<span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">Ready Buyer</span> Requirements',
+                subtitle: 'Pre-qualified cash and loan-approved buyers actively searching for properties in specific Kota Kinabalu neighborhoods.',
+                kicker: 'Active Buyer Demand',
+                heading: 'Ready Buyers Looking in Kota Kinabalu',
+                subheading: 'View target locations, desired bedrooms/bathrooms, land area, and buyer budget on the map.'
+            },
+            tenant: {
+                category: 'Ready Tenant',
+                priceLabel: 'Tenant Monthly Budget',
+                badge: 'Verified Corporate & Family Tenants • irumah.my',
+                title: '<span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">Ready Tenant</span> Requirements',
+                subtitle: 'Pre-screened corporate expatriates, medical specialists, and families looking to lease properties in Kota Kinabalu.',
+                kicker: 'Active Tenant Demand',
+                heading: 'Ready Tenants Seeking Rentals in KK',
+                subheading: 'Inspect preferred rental zones, monthly budget, and space requirements pinned on Google Maps.'
+            }
+        };
+
+        function getCategoryDisplayMeta(category) {
+            switch (category) {
+                case 'Property For Rent':
+                    return {
+                        priceLabel: 'Monthly Rental',
+                        suffix: ' / mo',
+                        badgeClass: 'bg-emerald-600 text-white'
+                    };
+                case 'New Projects':
+                    return {
+                        priceLabel: 'Launch Price From',
+                        suffix: '',
+                        badgeClass: 'bg-indigo-600 text-white'
+                    };
+                case 'Ready Buyer':
+                    return {
+                        priceLabel: 'Buyer Max Budget',
+                        suffix: '',
+                        badgeClass: 'bg-amber-600 text-white'
+                    };
+                case 'Ready Tenant':
+                    return {
+                        priceLabel: 'Tenant Budget',
+                        suffix: ' / mo',
+                        badgeClass: 'bg-purple-600 text-white'
+                    };
+                case 'Property For Sale':
+                default:
+                    return {
+                        priceLabel: 'Asking Price',
+                        suffix: '',
+                        badgeClass: 'bg-slate-900/90 text-white'
+                    };
+            }
+        }
+
+        function getAgentById(agentId) {
+            return users.find(u => u.id === agentId) || users[0] || DEFAULT_USERS[0];
+        }
+
+        function getAgentInitials(name) {
+            return (name || 'AG')
+                .trim()
+                .split(/\s+/)
+                .map(n => n[0])
+                .join('')
+                .slice(0, 2)
+                .toUpperCase();
+        }
+
+        function renderAgentAvatarMarkup(agent, sizeClasses = 'w-14 h-14 rounded-2xl text-lg', bgClasses = '') {
+            const initials = getAgentInitials(agent?.name);
+            const fallbackBg = bgClasses || (agent?.role === 'Super Admin'
+                ? 'bg-gradient-to-br from-slate-900 to-blue-900'
+                : 'bg-gradient-to-br from-blue-600 to-indigo-600');
+
+            if (agent && agent.avatar && agent.avatar.trim()) {
+                return `
+                    <span class="${sizeClasses} ${fallbackBg} text-white font-display font-extrabold flex items-center justify-center overflow-hidden shrink-0 shadow-xs">
+                        <img src="${agent.avatar}" alt="${agent.name}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <span style="display:none;" class="w-full h-full items-center justify-center">${initials}</span>
+                    </span>
+                `;
+            }
+
+            return `
+                <span class="${sizeClasses} ${fallbackBg} text-white font-display font-extrabold flex items-center justify-center shrink-0 shadow-xs">
+                    ${initials}
+                </span>
+            `;
+        }
+
+        // 7. GOOGLE MAPS CUSTOM PIN & INFOWINDOW BUILDERS
+        function isResidential(type) {
+            return RESIDENTIAL_TYPES.includes(type);
+        }
+
+        function formatMYR(amount) {
+            return 'RM ' + Number(amount || 0).toLocaleString('en-MY', { maximumFractionDigits: 0 });
+        }
+
+        function formatShortMYR(amount) {
+            const val = Number(amount || 0);
+            if (val >= 1000000) return 'RM ' + (val / 1000000).toFixed(2).replace(/\.00$/, '') + 'M';
+            if (val >= 1000) return 'RM ' + Math.round(val / 1000) + 'K';
+            return 'RM ' + val.toLocaleString('en-MY');
+        }
+
+        function getTypeBadgeClasses(type) {
+            switch (type) {
+                case 'House': return 'bg-blue-50 text-blue-700 border-blue-200';
+                case 'Condominium': return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+                case 'Apartment': return 'bg-cyan-50 text-cyan-700 border-cyan-200';
+                case 'Commercial': return 'bg-amber-50 text-amber-700 border-amber-200';
+                case 'Land': return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                default: return 'bg-slate-100 text-slate-700 border-slate-200';
+            }
+        }
+
+        function createPricePinIcon(labelText, isHighlighted = false) {
+            const bgFill = isHighlighted ? '#2563eb' : '#0f172a';
+            const borderFill = isHighlighted ? '#93c5fd' : '#38bdf8';
+            const safeLabel = String(labelText || 'RM').replace(/[<>&"]/g, '');
+            const width = Math.max(76, safeLabel.length * 8 + 24);
+            const height = 38;
+            const halfW = width / 2;
+
+            const svg = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+                    <rect x="2" y="2" width="${width - 4}" height="26" rx="13" fill="${bgFill}" stroke="${borderFill}" stroke-width="2"/>
+                    <polygon points="${halfW - 6},28 ${halfW + 6},28 ${halfW},36" fill="${bgFill}"/>
+                    <text x="${halfW}" y="19" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="700" text-anchor="middle">${safeLabel}</text>
+                </svg>
+            `.trim();
+
+            return {
+                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg),
+                scaledSize: new google.maps.Size(width, height),
+                anchor: new google.maps.Point(halfW, height)
+            };
+        }
+
+        function buildInfoWindowHTML(prop) {
+            const showBedBath = isResidential(prop.type);
+            const catName = prop.category || 'Property For Sale';
+            const catMeta = getCategoryDisplayMeta(catName);
+
+            return `
+                <div style="width: 270px; font-family: Inter, sans-serif; color: #1e293b;">
+                    <div style="position: relative; height: 125px; background: #e2e8f0;">
+                        <img src="${prop.image}" alt="${prop.name}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://placehold.co/400x220/1e293b/ffffff?text=irumah.my'">
+                        <span style="position: absolute; top: 8px; left: 8px; background: rgba(15,23,42,0.88); color: #fff; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px;">${catName}</span>
+                    </div>
+                    <div style="padding: 12px;">
+                        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #64748b;">${catMeta.priceLabel}</div>
+                        <div style="font-size: 16px; font-weight: 800; color: #2563eb;">${formatMYR(prop.price)}${catMeta.suffix}</div>
+                        <div style="font-size: 13px; font-weight: 700; color: #0f172a; margin-top: 2px; line-height: 1.3;">${prop.name}</div>
+                        <div style="font-size: 11px; color: #64748b; margin-top: 3px;">${prop.location}</div>
+                        ${showBedBath ? `<div style="font-size: 11px; font-weight: 600; color: #334155; margin-top: 6px;">${prop.bedrooms} Beds • ${prop.bathrooms} Baths</div>` : ''}
+                        <div style="font-size: 11px; color: #475569; margin-top: 4px;">Land: <b>${Number(prop.landSize).toLocaleString()}</b> sqft • Built: <b>${prop.builtUpArea > 0 ? Number(prop.builtUpArea).toLocaleString() + ' sqft' : 'N/A'}</b></div>
+                        <button onclick="openPropertyDetailModal('${prop.id}')" style="margin-top: 10px; width: 100%; background: #0f172a; color: #fff; border: none; border-radius: 8px; padding: 7px 10px; font-size: 11px; font-weight: 700; cursor: pointer;">
+                            View Full Details
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function highlightPropertyPin(activePropId) {
+            Object.entries(gMarkersMap).forEach(([id, marker]) => {
+                const p = properties.find(item => item.id === id);
+                if (!p) return;
+                marker.setIcon(createPricePinIcon(formatShortMYR(p.price), id === activePropId));
+                marker.setZIndex(id === activePropId ? 999 : 1);
+            });
+        }
+
+        function updateMapMarkers(filteredList) {
+            if (!isGoogleMapsReady || !gMap) return;
+
+            Object.values(gMarkersMap).forEach(marker => marker.setMap(null));
+            gMarkersMap = {};
+
+            filteredList.forEach(prop => {
+                const pos = { lat: Number(prop.lat), lng: Number(prop.lng) };
+                if (isNaN(pos.lat) || isNaN(pos.lng)) return;
+
+                const marker = new google.maps.Marker({
+                    position: pos,
+                    map: gMap,
+                    title: `${prop.name} (${formatMYR(prop.price)})`,
+                    icon: createPricePinIcon(formatShortMYR(prop.price), false)
+                });
+
+                marker.addListener('click', () => {
+                    highlightPropertyPin(prop.id);
+                    gInfoWindow.setContent(buildInfoWindowHTML(prop));
+                    gInfoWindow.open(gMap, marker);
+                });
+
+                gMarkersMap[prop.id] = marker;
+            });
+        }
+
+        function resetMapToKK() {
+            if (!isGoogleMapsReady || !gMap) return;
+            if (gInfoWindow) gInfoWindow.close();
+            highlightPropertyPin(null);
+            gMap.panTo(KK_CENTER);
+            gMap.setZoom(KK_DEFAULT_ZOOM);
+        }
+
+        function navigateToPage(pageKey) {
+            currentPublicPage = pageKey || 'home';
+            if (currentMainView !== 'public') {
+                switchMainView('public');
+            }
+
+            const heroSec = document.getElementById('section-hero');
+            const mapListingsSec = document.getElementById('section-map-listings');
+            const agentsSec = document.getElementById('section-agents');
+            const aboutSec = document.getElementById('section-about');
+            const contactSec = document.getElementById('section-contact');
+
+            const isInfoPage = ['agents', 'about', 'contact'].includes(currentPublicPage);
+
+            if (heroSec) heroSec.classList.toggle('hidden', isInfoPage);
+            if (mapListingsSec) mapListingsSec.classList.toggle('hidden', isInfoPage);
+            if (agentsSec) agentsSec.classList.toggle('hidden', currentPublicPage !== 'agents');
+            if (aboutSec) aboutSec.classList.toggle('hidden', currentPublicPage !== 'about');
+            if (contactSec) contactSec.classList.toggle('hidden', currentPublicPage !== 'contact');
+
+            // Update active nav styling
+            document.querySelectorAll('.nav-page-btn').forEach(btn => {
+                const active = btn.dataset.nav === currentPublicPage;
+                btn.classList.toggle('bg-blue-50', active);
+                btn.classList.toggle('text-blue-600', active);
+            });
+
+            document.querySelectorAll('.hero-cat-pill').forEach(pill => {
+                const active = pill.dataset.pill === currentPublicPage;
+                pill.className = active
+                    ? 'hero-cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold bg-blue-600 text-white transition'
+                    : 'hero-cat-pill px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white/10 hover:bg-white/20 text-slate-200 transition';
+            });
+
+            const mobileSel = document.getElementById('mobile-page-select');
+            if (mobileSel && mobileSel.value !== currentPublicPage) {
+                mobileSel.value = currentPublicPage;
+            }
+
+            if (!isInfoPage) {
+                const cfg = PAGE_CONFIG[currentPublicPage] || PAGE_CONFIG.home;
+                const badgeEl = document.getElementById('page-hero-badge');
+                const titleEl = document.getElementById('page-hero-title');
+                const subEl = document.getElementById('page-hero-subtitle');
+                const kickerEl = document.getElementById('section-map-kicker');
+                const headEl = document.getElementById('section-map-heading');
+                const subHeadEl = document.getElementById('section-map-subheading');
+
+                if (badgeEl) badgeEl.innerHTML = `<i class="fa-solid fa-location-dot text-rose-400"></i> ${cfg.badge}`;
+                if (titleEl) titleEl.innerHTML = cfg.title;
+                if (subEl) subEl.textContent = cfg.subtitle;
+                if (kickerEl) kickerEl.textContent = cfg.kicker;
+                if (headEl) headEl.textContent = cfg.heading;
+                if (subHeadEl) subHeadEl.textContent = cfg.subheading;
+
+                applyLayoutModeForPage(currentPublicPage);
+                renderPublicListings();
+            } else if (currentPublicPage === 'agents') {
+                renderPublicAgentsSection();
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function handleContactFormSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('contact-name')?.value || 'Client';
+            const topic = document.getElementById('contact-topic')?.value || 'Inquiry';
+            e.target.reset();
+            showToast(`Thank you ${name}! Your ${topic} inquiry has been sent to irumah.my Kota Kinabalu.`, 'success');
+        }
+
+        const HALF_MAP_PAGES = ['sale', 'rent', 'projects', 'buyer', 'tenant'];
+        let mobileSplitMode = 'cards'; // 'cards' | 'map'
+
+        function isHalfMapPage(page) {
+            return HALF_MAP_PAGES.includes(page);
+        }
+
+        function setMobileSplitMode(mode) {
+            mobileSplitMode = mode;
+            const cardsPanel = document.getElementById('cards-panel');
+            const mapPanel = document.getElementById('map-panel');
+            const btnCards = document.getElementById('btn-mobile-cards');
+            const btnMap = document.getElementById('btn-mobile-map');
+
+            if (!cardsPanel || !mapPanel || !isHalfMapPage(currentPublicPage)) return;
+
+            if (mode === 'map') {
+                cardsPanel.classList.add('hidden', 'lg:block');
+                mapPanel.classList.remove('hidden');
+                if (btnMap) btnMap.className = 'py-2 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-2xs transition';
+                if (btnCards) btnCards.className = 'py-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition';
+                if (isGoogleMapsReady && gMap) {
+                    setTimeout(() => {
+                        google.maps.event.trigger(gMap, 'resize');
+                        gMap.panTo(KK_CENTER);
+                    }, 80);
+                }
+            } else {
+                mapPanel.classList.add('hidden', 'lg:block');
+                cardsPanel.classList.remove('hidden');
+                if (btnCards) btnCards.className = 'py-2 rounded-lg text-xs font-bold bg-white text-slate-900 shadow-2xs transition';
+                if (btnMap) btnMap.className = 'py-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition';
+            }
+        }
+
+        function applyLayoutModeForPage(page) {
+            const mapListingsSection = document.getElementById('section-map-listings');
+            const splitContainer = document.getElementById('map-listings-split-container');
+            const mapPanel = document.getElementById('map-panel');
+            const cardsPanel = document.getElementById('cards-panel');
+            const grid = document.getElementById('properties-grid');
+            const mobileToggle = document.getElementById('mobile-split-toggle');
+
+            if (!splitContainer || !mapPanel || !cardsPanel || !grid) return;
+
+            if (isHalfMapPage(page)) {
+                // Constrain section to 80% horizontal width on desktop, centered
+                if (mapListingsSection) {
+                    mapListingsSection.className = 'py-8 sm:py-10 px-4 sm:px-6 lg:px-0 w-full lg:w-[80%] mx-auto';
+                }
+                // 50% Left Listing Cards + 50% Right Sticky Google Map
+                splitContainer.className = 'grid grid-cols-1 lg:grid-cols-2 gap-6 items-start';
+                cardsPanel.className = 'order-1 w-full lg:max-h-[calc(100vh-11rem)] lg:overflow-y-auto lg:pr-2';
+                mapPanel.className = 'order-2 w-full h-[460px] lg:h-[calc(100vh-11rem)] lg:sticky lg:top-20 rounded-2xl overflow-hidden border border-slate-200 shadow-md relative bg-slate-200';
+                grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-5';
+
+                if (mobileToggle) {
+                    mobileToggle.classList.remove('hidden');
+                    mobileToggle.classList.add('grid');
+                }
+                setMobileSplitMode(mobileSplitMode);
+            } else {
+                // Home Page: Full-width stacked Map + 3-column Listing Cards
+                if (mapListingsSection) {
+                    mapListingsSection.className = 'py-8 sm:py-10 px-4 sm:px-6 lg:px-8 max-w-[1920px] w-full mx-auto';
+                }
+                splitContainer.className = 'flex flex-col gap-8';
+                mapPanel.className = 'w-full h-[420px] sm:h-[480px] rounded-2xl overflow-hidden border border-slate-200 shadow-md relative bg-slate-200';
+                cardsPanel.className = 'w-full';
+                grid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
+
+                if (mobileToggle) {
+                    mobileToggle.classList.add('hidden');
+                    mobileToggle.classList.remove('grid');
+                }
+            }
+
+            if (isGoogleMapsReady && gMap) {
+                setTimeout(() => {
+                    google.maps.event.trigger(gMap, 'resize');
+                    gMap.panTo(KK_CENTER);
+                }, 120);
+            }
+        }
+
+        function focusPropertyOnMap(propId, event) {
+            if (event) event.stopPropagation();
+            const prop = properties.find(p => p.id === propId);
+            if (!prop || !isGoogleMapsReady || !gMap) return;
+
+            if (isHalfMapPage(currentPublicPage) && window.innerWidth < 1024) {
+                setMobileSplitMode('map');
+            }
+
+            const mapSection = document.getElementById('section-map-listings');
+            if (mapSection) {
+                mapSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            const pos = { lat: Number(prop.lat), lng: Number(prop.lng) };
+            gMap.panTo(pos);
+            gMap.setZoom(15);
+
+            const marker = gMarkersMap[propId];
+            if (marker) {
+                highlightPropertyPin(propId);
+                gInfoWindow.setContent(buildInfoWindowHTML(prop));
+                gInfoWindow.open(gMap, marker);
+            }
+        }
+
+        // 8. HERO LIVE SEARCH AUTOCOMPLETE & PUBLIC LISTINGS RENDER
+        function handleHeroSearchInput() {
+            const input = document.getElementById('filter-search');
+            const clearBtn = document.getElementById('btn-clear-search');
+            const dropdown = document.getElementById('search-suggestions-dropdown');
+            const listEl = document.getElementById('search-suggestions-list');
+            const countEl = document.getElementById('suggestion-match-count');
+
+            const query = (input?.value || '').trim().toLowerCase();
+
+            if (clearBtn) {
+                clearBtn.classList.toggle('hidden', query.length === 0);
+            }
+
+            applyFilters();
+
+            if (!query) {
+                dropdown.classList.add('hidden');
+                return;
+            }
+
+            const matches = properties.filter(p =>
+                p.name.toLowerCase().includes(query) ||
+                p.location.toLowerCase().includes(query) ||
+                p.type.toLowerCase().includes(query)
+            );
+
+            countEl.textContent = `${matches.length} ${matches.length === 1 ? 'match' : 'matches'}`;
+
+            if (matches.length === 0) {
+                listEl.innerHTML = `
+                    <li class="px-4 py-3 text-xs text-slate-500 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-info text-slate-400"></i>
+                        <span>No property titles matching "<strong>${query}</strong>" in Kota Kinabalu.</span>
+                    </li>
+                `;
+            } else {
+                listEl.innerHTML = matches.map(prop => `
+                    <li onclick="selectSearchSuggestion('${prop.id}')" class="px-4 py-2.5 hover:bg-blue-50/80 cursor-pointer transition flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <img src="${prop.image}" alt="${prop.name}" onerror="this.src='https://placehold.co/80x60/1e293b/ffffff?text=KK'" class="w-11 h-9 rounded-lg object-cover shrink-0 bg-slate-200">
+                            <div class="min-w-0">
+                                <div class="text-xs font-bold text-slate-900 truncate">${prop.name}</div>
+                                <div class="text-[11px] text-slate-500 truncate">
+                                    <span class="font-semibold text-blue-600">${prop.type}</span> • ${prop.location}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right shrink-0">
+                            <div class="font-display font-extrabold text-xs text-emerald-600">${formatMYR(prop.price)}</div>
+                            <div class="text-[10px] text-slate-400">Pin on Map <i class="fa-solid fa-arrow-up-right-from-square ml-0.5"></i></div>
+                        </div>
+                    </li>
+                `).join('');
+            }
+
+            dropdown.classList.remove('hidden');
+        }
+
+        function selectSearchSuggestion(propId) {
+            const prop = properties.find(p => p.id === propId);
+            if (!prop) return;
+
+            const input = document.getElementById('filter-search');
+            const dropdown = document.getElementById('search-suggestions-dropdown');
+            const clearBtn = document.getElementById('btn-clear-search');
+
+            input.value = prop.name;
+            if (clearBtn) clearBtn.classList.remove('hidden');
+            dropdown.classList.add('hidden');
+
+            applyFilters();
+            focusPropertyOnMap(prop.id);
+        }
+
+        function clearSearchInput() {
+            const input = document.getElementById('filter-search');
+            const dropdown = document.getElementById('search-suggestions-dropdown');
+            const clearBtn = document.getElementById('btn-clear-search');
+
+            input.value = '';
+            dropdown.classList.add('hidden');
+            if (clearBtn) clearBtn.classList.add('hidden');
+            applyFilters();
+        }
+
+        function quickSearchKeyword(keyword) {
+            const input = document.getElementById('filter-search');
+            const clearBtn = document.getElementById('btn-clear-search');
+            input.value = keyword;
+            if (clearBtn) clearBtn.classList.remove('hidden');
+            applyFilters();
+            scrollToMapSection();
+        }
+
+        function scrollToMapSection() {
+            const section = document.getElementById('section-map-listings');
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function getFilteredProperties() {
+            const search = (document.getElementById('filter-search')?.value || '').toLowerCase().trim();
+            const type = document.getElementById('filter-type')?.value || 'ALL';
+            const priceRange = document.getElementById('filter-price')?.value || 'ALL';
+            const activePageCfg = PAGE_CONFIG[currentPublicPage] || PAGE_CONFIG.home;
+            const requiredCategory = activePageCfg.category;
+
+            return properties.filter(prop => {
+                const propCat = prop.category || 'Property For Sale';
+                const matchesCategory = requiredCategory === 'ALL' || propCat === requiredCategory;
+
+                const matchesSearch = !search ||
+                    prop.name.toLowerCase().includes(search) ||
+                    prop.location.toLowerCase().includes(search) ||
+                    prop.type.toLowerCase().includes(search) ||
+                    propCat.toLowerCase().includes(search);
+
+                const matchesType = type === 'ALL' || prop.type === type;
+
+                let matchesPrice = true;
+                if (priceRange !== 'ALL') {
+                    const [min, max] = priceRange.split('-').map(Number);
+                    matchesPrice = prop.price >= min && prop.price <= max;
+                }
+
+                return matchesCategory && matchesSearch && matchesType && matchesPrice;
+            });
+        }
+
+        function applyFilters() {
+            renderPublicListings();
+        }
+
+        function resetFilters() {
+            document.getElementById('filter-search').value = '';
+            document.getElementById('filter-type').value = 'ALL';
+            document.getElementById('filter-price').value = 'ALL';
+            const clearBtn = document.getElementById('btn-clear-search');
+            if (clearBtn) clearBtn.classList.add('hidden');
+            renderPublicListings();
+        }
+
+        function renderPublicListings() {
+            const filtered = getFilteredProperties();
+            const grid = document.getElementById('properties-grid');
+            const emptyState = document.getElementById('empty-listings-state');
+            const badge = document.getElementById('listing-count-badge');
+
+            if (badge) {
+                badge.textContent = `${filtered.length} ${filtered.length === 1 ? 'Property' : 'Properties'} in KK`;
+            }
+
+            if (grid && emptyState) {
+                if (filtered.length === 0) {
+                    grid.innerHTML = '';
+                    grid.classList.add('hidden');
+                    emptyState.classList.remove('hidden');
+                    emptyState.classList.add('flex');
+                } else {
+                    emptyState.classList.add('hidden');
+                    emptyState.classList.remove('flex');
+                    grid.classList.remove('hidden');
+
+                    grid.innerHTML = filtered.map(prop => {
+                        const agent = getAgentById(prop.agentId);
+                        const showBedBath = isResidential(prop.type);
+                        const catName = prop.category || 'Property For Sale';
+                        const catMeta = getCategoryDisplayMeta(catName);
+
+                        const bedBathRow = showBedBath
+                            ? `
+                            <div class="flex items-center gap-4 text-xs font-semibold text-slate-700 py-2.5 px-3 rounded-xl bg-slate-50 border border-slate-100 mb-3">
+                                <span class="flex items-center gap-1.5">
+                                    <i class="fa-solid fa-bed text-blue-600"></i>
+                                    <span>${prop.bedrooms} Beds</span>
+                                </span>
+                                <span class="flex items-center gap-1.5">
+                                    <i class="fa-solid fa-bath text-blue-600"></i>
+                                    <span>${prop.bathrooms} Baths</span>
+                                </span>
+                            </div>
+                            `
+                            : '';
+
+                        return `
+                        <article onclick="openPropertyDetailModal('${prop.id}')" class="bg-white rounded-2xl border border-slate-200/90 hover:border-blue-400 shadow-2xs hover:shadow-xl transition-all duration-200 overflow-hidden cursor-pointer flex flex-col justify-between group animate-fade-in">
+                            <div>
+                                <!-- Property Photo -->
+                                <div class="relative h-52 w-full bg-slate-200 overflow-hidden">
+                                    <img src="${prop.image}" alt="${prop.name}" onerror="this.src='https://placehold.co/800x500/1e293b/ffffff?text=irumah.my'" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                    <div class="absolute top-3 left-3 flex flex-wrap items-center gap-1.5">
+                                        <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold ${catMeta.badgeClass} backdrop-blur-xs shadow-2xs">
+                                            ${catName}
+                                        </span>
+                                        <span class="px-2.5 py-1 rounded-lg text-[11px] font-bold border shadow-2xs ${getTypeBadgeClasses(prop.type)}">
+                                            ${prop.type}
+                                        </span>
+                                    </div>
+                                    <button type="button" onclick="focusPropertyOnMap('${prop.id}', event)" title="Pin on Kota Kinabalu Map" class="absolute bottom-3 right-3 px-2.5 py-1.5 rounded-lg bg-slate-900/80 hover:bg-blue-600 text-white text-[11px] font-semibold backdrop-blur-xs transition flex items-center gap-1">
+                                        <i class="fa-solid fa-location-dot text-rose-400 group-hover:text-white"></i>
+                                        <span>Pin on Map</span>
+                                    </button>
+                                </div>
+
+                                <!-- Card Body -->
+                                <div class="p-5">
+                                    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">${catMeta.priceLabel}</div>
+                                    <div class="font-display font-extrabold text-xl text-blue-600">
+                                        ${formatMYR(prop.price)}${catMeta.suffix ? ` <span class="text-xs font-semibold text-slate-400">${catMeta.suffix}</span>` : ''}
+                                    </div>
+                                    <h3 class="font-display font-bold text-base text-slate-900 group-hover:text-blue-600 transition line-clamp-1 mt-1">
+                                        ${prop.name}
+                                    </h3>
+                                    <p class="text-xs text-slate-500 flex items-center gap-1.5 mt-1 truncate">
+                                        <i class="fa-solid fa-map-pin text-rose-500 shrink-0"></i>
+                                        <span class="truncate">${prop.location}</span>
+                                    </p>
+
+                                    <!-- Conditional Bedrooms & Bathrooms (House, Condominium, Apartment only) -->
+                                    <div class="mt-3">
+                                        ${bedBathRow}
+                                    </div>
+
+                                    <!-- Land Size & Built-up Area -->
+                                    <div class="grid grid-cols-2 gap-2.5 text-xs pt-2 border-t border-slate-100">
+                                        <div class="bg-slate-50/80 rounded-xl p-2.5">
+                                            <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 block">Land Size</span>
+                                            <span class="font-bold text-slate-800">${Number(prop.landSize).toLocaleString()} sq ft</span>
+                                        </div>
+                                        <div class="bg-slate-50/80 rounded-xl p-2.5">
+                                            <span class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 block">Built-up Area</span>
+                                            <span class="font-bold text-slate-800">${prop.builtUpArea > 0 ? Number(prop.builtUpArea).toLocaleString() + ' sq ft' : 'N/A'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card Footer: Assigned Agent -->
+                            <div class="px-5 py-3 bg-slate-50/90 border-t border-slate-100 flex items-center justify-between text-xs">
+                                <div class="flex items-center gap-2 min-w-0">
+                                    <span class="w-6 h-6 rounded-full bg-slate-900 text-white font-bold text-[10px] flex items-center justify-center shrink-0">
+                                        ${agent.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                                    </span>
+                                    <span class="font-semibold text-slate-700 truncate">${agent.name}</span>
+                                </div>
+                                <span class="text-[11px] font-semibold text-blue-600 shrink-0">Details &rarr;</span>
+                            </div>
+                        </article>
+                        `;
+                    }).join('');
+                }
+            }
+
+            updateMapMarkers(filtered);
+        }
+
+        function renderPublicAgentsSection() {
+            const grid = document.getElementById('public-agents-grid');
+            if (!grid) return;
+
+            grid.innerHTML = users.map(agent => {
+                const agentProps = properties.filter(p => p.agentId === agent.id);
+                const isSuper = agent.role === 'Super Admin';
+
+                return `
+                <div class="bg-slate-50 hover:bg-white rounded-2xl border border-slate-200/90 hover:border-blue-300 p-6 shadow-2xs hover:shadow-xl transition-all duration-200 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="flex items-center gap-3.5">
+                                ${renderAgentAvatarMarkup(agent, 'w-14 h-14 rounded-2xl text-lg shadow-md')}
+                                <div>
+                                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${isSuper ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-700'}">
+                                        ${agent.role}
+                                    </span>
+                                    <h3 class="font-display font-bold text-lg text-slate-900 mt-1">${agent.name}</h3>
+                                    <p class="text-xs font-semibold text-slate-500">${agent.ren}</p>
+                                </div>
+                            </div>
+
+                            <span class="px-2.5 py-1 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 shrink-0">
+                                ${agentProps.length} ${agentProps.length === 1 ? 'Listing' : 'Listings'}
+                            </span>
+                        </div>
+
+                        <div class="mt-5 pt-4 border-t border-slate-200/70 space-y-2 text-xs text-slate-600">
+                            <div class="flex items-center gap-2.5">
+                                <i class="fa-solid fa-envelope text-blue-600 w-4 text-center"></i>
+                                <span class="truncate">${agent.email}</span>
+                            </div>
+                            <div class="flex items-center gap-2.5">
+                                <i class="fa-solid fa-phone text-emerald-600 w-4 text-center"></i>
+                                <span>${agent.phone}</span>
+                            </div>
+                            <div class="flex items-center gap-2.5">
+                                <i class="fa-solid fa-location-dot text-rose-500 w-4 text-center"></i>
+                                <span>Kota Kinabalu, Sabah</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-slate-200/70 flex items-center gap-2.5">
+                        <a href="tel:${agent.phone}" class="flex-1 py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-blue-600 text-white text-xs font-bold text-center transition flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-phone"></i>
+                            <span>Call Agent</span>
+                        </a>
+                        <a href="mailto:${agent.email}" class="py-2.5 px-3.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold transition" title="Email ${agent.name}">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </a>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        // 9. PROPERTY DETAILS MODAL
+        function openPropertyDetailModal(propId) {
+            const prop = properties.find(p => p.id === propId);
+            if (!prop) return;
+            const agent = getAgentById(prop.agentId);
+            const showBedBath = isResidential(prop.type);
+            const catName = prop.category || 'Property For Sale';
+            const catMeta = getCategoryDisplayMeta(catName);
+
+            const modal = document.getElementById('modal-property-detail');
+            const container = document.getElementById('property-detail-content');
+
+            container.innerHTML = `
+                <div class="relative h-64 sm:h-80 w-full bg-slate-200">
+                    <img src="${prop.image}" alt="${prop.name}" onerror="this.src='https://placehold.co/900x500/1e293b/ffffff?text=irumah.my'" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent"></div>
+                    <div class="absolute bottom-5 left-6 right-6 text-white">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="px-2.5 py-1 rounded-lg text-xs font-bold ${catMeta.badgeClass}">
+                                ${catName}
+                            </span>
+                            <span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white">
+                                ${prop.type}
+                            </span>
+                        </div>
+                        <h2 class="font-display font-extrabold text-2xl sm:text-3xl mt-2">${prop.name}</h2>
+                        <p class="text-xs sm:text-sm text-slate-200 mt-1">
+                            <i class="fa-solid fa-location-dot text-rose-400 mr-1.5"></i>${prop.location}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="p-6 sm:p-7">
+                    <div class="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-slate-200">
+                        <div>
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">${catMeta.priceLabel}</span>
+                            <div class="font-display font-extrabold text-3xl text-blue-600">${formatMYR(prop.price)}${catMeta.suffix ? ` <span class="text-base font-semibold text-slate-400">${catMeta.suffix}</span>` : ''}</div>
+                        </div>
+                        <button onclick="closePropertyDetailModal(); focusPropertyOnMap('${prop.id}')" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center gap-2 transition">
+                            <i class="fa-solid fa-map-location-dot text-blue-600"></i>
+                            <span>Show Pin on Map (${prop.lat.toFixed(4)}, ${prop.lng.toFixed(4)})</span>
+                        </button>
+                    </div>
+
+                    <!-- Specs Badges -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 my-5">
+                        ${showBedBath ? `
+                        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                            <div class="text-xs text-slate-500">Bedrooms</div>
+                            <div class="font-display font-bold text-lg text-slate-900 mt-0.5"><i class="fa-solid fa-bed text-blue-600 mr-1.5"></i>${prop.bedrooms}</div>
+                        </div>
+                        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                            <div class="text-xs text-slate-500">Bathrooms</div>
+                            <div class="font-display font-bold text-lg text-slate-900 mt-0.5"><i class="fa-solid fa-bath text-blue-600 mr-1.5"></i>${prop.bathrooms}</div>
+                        </div>
+                        ` : ''}
+                        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                            <div class="text-xs text-slate-500">Land Size</div>
+                            <div class="font-display font-bold text-lg text-slate-900 mt-0.5">${Number(prop.landSize).toLocaleString()} <span class="text-xs font-normal text-slate-500">sq ft</span></div>
+                        </div>
+                        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                            <div class="text-xs text-slate-500">Built-up Area</div>
+                            <div class="font-display font-bold text-lg text-slate-900 mt-0.5">${prop.builtUpArea > 0 ? Number(prop.builtUpArea).toLocaleString() + ' <span class="text-xs font-normal text-slate-500">sq ft</span>' : 'N/A'}</div>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-6">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Property Overview</h4>
+                        <p class="text-sm text-slate-600 leading-relaxed">
+                            ${prop.description || 'Prime Kota Kinabalu property listing on irumah.my. Contact our assigned real estate negotiator for private viewing arrangements.'}
+                        </p>
+                    </div>
+
+                    <!-- Assigned Agent Card -->
+                    <div class="p-4 rounded-2xl bg-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-center gap-3.5">
+                            ${renderAgentAvatarMarkup(agent, 'w-12 h-12 rounded-xl text-base', 'bg-blue-600')}
+                            <div>
+                                <div class="text-[10px] font-bold uppercase tracking-wider text-blue-400">Listed By • ${agent.role}</div>
+                                <div class="font-display font-bold text-base text-white">${agent.name}</div>
+                                <div class="text-xs text-slate-300">${agent.ren} • ${agent.phone}</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <a href="tel:${agent.phone}" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-phone"></i> Call
+                            </a>
+                            <a href="mailto:${agent.email}?subject=Inquiry%20via%20irumah.my:%20${encodeURIComponent(prop.name)}" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-envelope"></i> Email
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closePropertyDetailModal() {
+            const modal = document.getElementById('modal-property-detail');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // 10. AUTHENTICATION & VIEW ROUTING (NO PUBLIC REGISTRATION)
+        function openLoginModal() {
+            const modal = document.getElementById('modal-login');
+            const errMsg = document.getElementById('login-error-msg');
+            if (errMsg) errMsg.classList.add('hidden');
+            document.getElementById('login-email').value = '';
+            document.getElementById('login-password').value = '';
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeLoginModal() {
+            const modal = document.getElementById('modal-login');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function fillSuperAdminCredentials() {
+            document.getElementById('login-email').value = 'yapsoonkeong@outlook.com';
+            document.getElementById('login-password').value = '123456';
+        }
+
+        function handleLoginSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim().toLowerCase();
+            const password = document.getElementById('login-password').value;
+            const errMsg = document.getElementById('login-error-msg');
+
+            const matched = users.find(u => u.email.toLowerCase() === email && u.password === password);
+            if (!matched) {
+                if (errMsg) errMsg.classList.remove('hidden');
+                return;
+            }
+
+            currentUser = matched;
+            localStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify({ id: matched.id, email: matched.email }));
+            closeLoginModal();
+            updateAuthUI();
+            renderDashboard();
+            switchMainView('dashboard');
+            showToast(`Signed in to irumah.my as ${matched.name} (${matched.role}).`, 'success');
+        }
+
+        function logoutUser() {
+            currentUser = null;
+            localStorage.removeItem(STORAGE_KEYS.SESSION);
+            updateAuthUI();
+            switchMainView('public');
+            showToast('Signed out.', 'info');
+        }
+
+        function updateAuthUI() {
+            const authControls = document.getElementById('nav-auth-controls');
+            const guestControls = document.getElementById('nav-guest-controls');
+
+            if (currentUser) {
+                authControls.classList.remove('hidden');
+                authControls.classList.add('flex');
+                guestControls.classList.add('hidden');
+
+                document.getElementById('nav-user-name').textContent = currentUser.name;
+                document.getElementById('nav-user-role').textContent = currentUser.role;
+                const navAvatarEl = document.getElementById('nav-user-avatar');
+                if (navAvatarEl) {
+                    navAvatarEl.outerHTML = renderAgentAvatarMarkup(currentUser, 'w-9 h-9 rounded-full text-xs', 'bg-slate-900');
+                    const newlyRendered = document.querySelector('#nav-auth-controls .w-9.h-9.rounded-full');
+                    if (newlyRendered) newlyRendered.id = 'nav-user-avatar';
+                }
+
+                document.getElementById('dash-welcome-name').textContent = currentUser.name;
+                document.getElementById('dash-role-badge').textContent = currentUser.role;
+
+                const isSuperAdmin = currentUser.role === 'Super Admin';
+                const tabAgentsBtn = document.getElementById('tab-btn-agents');
+                if (isSuperAdmin) {
+                    tabAgentsBtn.classList.remove('hidden');
+                } else {
+                    tabAgentsBtn.classList.add('hidden');
+                    if (currentDashTab === 'agents') switchDashboardTab('properties');
+                }
+            } else {
+                authControls.classList.add('hidden');
+                authControls.classList.remove('flex');
+                guestControls.classList.remove('hidden');
+            }
+        }
+
+        function switchMainView(view) {
+            if (view === 'dashboard' && !currentUser) {
+                openLoginModal();
+                return;
+            }
+
+            currentMainView = view;
+            const publicView = document.getElementById('view-public');
+            const dashView = document.getElementById('view-dashboard');
+            const toggleText = document.getElementById('btn-toggle-view-text');
+
+            if (view === 'dashboard') {
+                publicView.classList.add('hidden');
+                dashView.classList.remove('hidden');
+                if (toggleText) toggleText.textContent = 'Public Map View';
+                renderDashboard();
+            } else {
+                dashView.classList.add('hidden');
+                publicView.classList.remove('hidden');
+                if (toggleText) toggleText.textContent = 'Admin Dashboard';
+                renderPublicListings();
+                if (isGoogleMapsReady && gMap) {
+                    setTimeout(() => google.maps.event.trigger(gMap, 'resize'), 100);
+                }
+            }
+        }
+
+        function togglePortalView() {
+            switchMainView(currentMainView === 'public' ? 'dashboard' : 'public');
+        }
+
+        // 11. ADMIN & AGENT DASHBOARD RENDERING
+        function switchDashboardTab(tab) {
+            if (tab === 'agents' && (!currentUser || currentUser.role !== 'Super Admin')) {
+                showToast('Only Super Admin can manage agent accounts.', 'error');
+                return;
+            }
+
+            currentDashTab = tab;
+            const propTab = document.getElementById('dash-tab-properties');
+            const agentTab = document.getElementById('dash-tab-agents');
+            const btnProp = document.getElementById('tab-btn-properties');
+            const btnAgent = document.getElementById('tab-btn-agents');
+
+            if (tab === 'properties') {
+                propTab.classList.remove('hidden');
+                agentTab.classList.add('hidden');
+                btnProp.classList.add('border-blue-600', 'text-blue-600');
+                btnProp.classList.remove('border-transparent', 'text-slate-500');
+                btnAgent.classList.remove('border-blue-600', 'text-blue-600');
+                btnAgent.classList.add('border-transparent', 'text-slate-500');
+            } else {
+                agentTab.classList.remove('hidden');
+                propTab.classList.add('hidden');
+                btnAgent.classList.add('border-blue-600', 'text-blue-600');
+                btnAgent.classList.remove('border-transparent', 'text-slate-500');
+                btnProp.classList.remove('border-blue-600', 'text-blue-600');
+                btnProp.classList.add('border-transparent', 'text-slate-500');
+            }
+        }
+
+        function renderDashboard() {
+            document.getElementById('stat-total-properties').textContent = properties.length;
+            const totalValue = properties.reduce((acc, p) => acc + Number(p.price || 0), 0);
+            document.getElementById('stat-total-value').textContent = formatShortMYR(totalValue);
+            document.getElementById('stat-total-agents').textContent = users.length;
+
+            const propTbody = document.getElementById('admin-properties-tbody');
+            propTbody.innerHTML = properties.map(prop => {
+                const agent = getAgentById(prop.agentId);
+                const showBedBath = isResidential(prop.type);
+
+                return `
+                <tr class="hover:bg-slate-50/80 transition">
+                    <td class="py-3.5 px-4">
+                        <div class="flex items-center gap-3">
+                            <img src="${prop.image}" alt="${prop.name}" onerror="this.src='https://placehold.co/120x90/1e293b/ffffff?text=KK'" class="w-14 h-11 rounded-lg object-cover bg-slate-200 shrink-0">
+                            <div>
+                                <div class="font-bold text-slate-900 line-clamp-1">${prop.name}</div>
+                                <div class="text-xs text-slate-500 line-clamp-1">${prop.location}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-3.5 px-4">
+                        <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">${prop.category || 'Property For Sale'}</span>
+                        <span class="px-2.5 py-1 rounded-lg text-xs font-bold border ${getTypeBadgeClasses(prop.type)}">
+                            ${prop.type}
+                        </span>
+                    </td>
+                    <td class="py-3.5 px-4 font-display font-bold text-slate-900 whitespace-nowrap">
+                        ${formatMYR(prop.price)}
+                    </td>
+                    <td class="py-3.5 px-4 text-xs text-slate-600">
+                        ${showBedBath ? `<div class="font-semibold text-slate-800">${prop.bedrooms} Bed • ${prop.bathrooms} Bath</div>` : ''}
+                        <div>Land: ${Number(prop.landSize).toLocaleString()} sqft</div>
+                        ${prop.builtUpArea > 0 ? `<div>Built: ${Number(prop.builtUpArea).toLocaleString()} sqft</div>` : ''}
+                    </td>
+                    <td class="py-3.5 px-4">
+                        <div class="text-xs font-bold text-slate-800">${agent.name}</div>
+                        <div class="text-[11px] text-slate-400">${agent.ren}</div>
+                    </td>
+                    <td class="py-3.5 px-4 text-right whitespace-nowrap">
+                        <button onclick="openPropertyFormModal('${prop.id}')" class="px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold mr-1.5 transition">
+                            <i class="fa-solid fa-pen-to-square"></i> Edit
+                        </button>
+                        <button onclick="deleteProperty('${prop.id}')" class="px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold transition">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+
+            const agentTbody = document.getElementById('admin-agents-tbody');
+            agentTbody.innerHTML = users.map(u => {
+                const assignedCount = properties.filter(p => p.agentId === u.id).length;
+                const isSuper = u.role === 'Super Admin';
+
+                return `
+                <tr class="hover:bg-slate-50/80 transition">
+                    <td class="py-3.5 px-4">
+                        <div class="flex items-center gap-3">
+                            ${renderAgentAvatarMarkup(u, 'w-10 h-10 rounded-full text-xs', isSuper ? 'bg-slate-900' : 'bg-indigo-600')}
+                            <div>
+                                <div class="font-bold text-slate-900">${u.name}</div>
+                                <div class="text-xs text-slate-500 font-mono">${u.email}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="py-3.5 px-4">
+                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${isSuper ? 'bg-amber-100 text-amber-800' : 'bg-indigo-50 text-indigo-700'}">
+                            ${u.role}
+                        </span>
+                        <div class="text-xs text-slate-500 mt-1">${u.ren}</div>
+                    </td>
+                    <td class="py-3.5 px-4 text-xs text-slate-700">
+                        <div><i class="fa-solid fa-phone text-slate-400 mr-1.5"></i>${u.phone}</div>
+                        <div class="text-[11px] text-slate-400 mt-0.5">Password: <span class="font-mono text-slate-600">${u.password}</span></div>
+                    </td>
+                    <td class="py-3.5 px-4">
+                        <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold">
+                            ${assignedCount} ${assignedCount === 1 ? 'Property' : 'Properties'}
+                        </span>
+                    </td>
+                    <td class="py-3.5 px-4 text-right whitespace-nowrap">
+                        <button onclick="openAgentFormModal('${u.id}')" class="px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold mr-1.5 transition">
+                            <i class="fa-solid fa-user-pen"></i> Edit
+                        </button>
+                        ${!isSuper ? `
+                        <button onclick="deleteAgent('${u.id}')" class="px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold transition">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                        ` : ''}
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        // 12. ADD / EDIT PROPERTY FORM & MINI-MAP PICKER (SUPABASE CRUD)
+        function toggleResidentialFields() {
+            const type = document.getElementById('prop-form-type').value;
+            const resBox = document.getElementById('prop-residential-fields');
+            if (isResidential(type)) {
+                resBox.classList.remove('hidden');
+                resBox.classList.add('grid');
+            } else {
+                resBox.classList.add('hidden');
+                resBox.classList.remove('grid');
+            }
+        }
+
+        function setPresetImage(url) {
+            document.getElementById('prop-form-image').value = url;
+        }
+
+        function openPropertyFormModal(propId = null) {
+            const modal = document.getElementById('modal-property-form');
+            const title = document.getElementById('prop-form-title');
+            const agentSelect = document.getElementById('prop-form-agent');
+
+            agentSelect.innerHTML = users.map(u => `<option value="${u.id}">${u.name} (${u.role} - ${u.ren})</option>`).join('');
+
+            if (propId) {
+                const prop = properties.find(p => p.id === propId);
+                if (!prop) return;
+                title.textContent = 'Edit Property Listing';
+                document.getElementById('prop-form-id').value = prop.id;
+                document.getElementById('prop-form-name').value = prop.name;
+                document.getElementById('prop-form-category').value = prop.category || 'Property For Sale';
+                document.getElementById('prop-form-type').value = prop.type;
+                document.getElementById('prop-form-bedrooms').value = prop.bedrooms || 0;
+                document.getElementById('prop-form-bathrooms').value = prop.bathrooms || 0;
+                document.getElementById('prop-form-price').value = prop.price;
+                document.getElementById('prop-form-land').value = prop.landSize;
+                document.getElementById('prop-form-buildup').value = prop.builtUpArea;
+                document.getElementById('prop-form-location').value = prop.location;
+                document.getElementById('prop-form-agent').value = prop.agentId;
+                document.getElementById('prop-form-lat').value = prop.lat;
+                document.getElementById('prop-form-lng').value = prop.lng;
+                document.getElementById('prop-form-image').value = prop.image;
+                document.getElementById('prop-form-desc').value = prop.description || '';
+            } else {
+                title.textContent = 'Add New Property Listing';
+                document.getElementById('prop-form-id').value = '';
+                document.getElementById('prop-form-name').value = '';
+                document.getElementById('prop-form-category').value = 'Property For Sale';
+                document.getElementById('prop-form-type').value = 'Condominium';
+                document.getElementById('prop-form-bedrooms').value = 3;
+                document.getElementById('prop-form-bathrooms').value = 2;
+                document.getElementById('prop-form-price').value = '';
+                document.getElementById('prop-form-land').value = '';
+                document.getElementById('prop-form-buildup').value = '';
+                document.getElementById('prop-form-location').value = 'Kota Kinabalu, Sabah';
+                document.getElementById('prop-form-agent').value = currentUser ? currentUser.id : users[0].id;
+                document.getElementById('prop-form-lat').value = KK_CENTER.lat;
+                document.getElementById('prop-form-lng').value = KK_CENTER.lng;
+                document.getElementById('prop-form-image').value = 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=900&q=80';
+                document.getElementById('prop-form-desc').value = '';
+            }
+
+            toggleResidentialFields();
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            const initialPos = {
+                lat: parseFloat(document.getElementById('prop-form-lat').value) || KK_CENTER.lat,
+                lng: parseFloat(document.getElementById('prop-form-lng').value) || KK_CENTER.lng
+            };
+
+            setTimeout(() => {
+                if (!isGoogleMapsReady) return;
+                const pickerEl = document.getElementById('picker-map');
+                if (!pickerGMap) {
+                    pickerGMap = new google.maps.Map(pickerEl, {
+                        center: initialPos,
+                        zoom: 13,
+                        mapTypeControl: false,
+                        streetViewControl: false,
+                        fullscreenControl: false
+                    });
+
+                    pickerGMarker = new google.maps.Marker({
+                        position: initialPos,
+                        map: pickerGMap,
+                        draggable: true,
+                        title: 'Drag or click map to pin Kota Kinabalu location'
+                    });
+
+                    pickerGMap.addListener('click', (e) => {
+                        const lat = e.latLng.lat();
+                        const lng = e.latLng.lng();
+                        pickerGMarker.setPosition({ lat, lng });
+                        document.getElementById('prop-form-lat').value = lat.toFixed(6);
+                        document.getElementById('prop-form-lng').value = lng.toFixed(6);
+                    });
+
+                    pickerGMarker.addListener('dragend', () => {
+                        const pos = pickerGMarker.getPosition();
+                        document.getElementById('prop-form-lat').value = pos.lat().toFixed(6);
+                        document.getElementById('prop-form-lng').value = pos.lng().toFixed(6);
+                    });
+                } else {
+                    google.maps.event.trigger(pickerGMap, 'resize');
+                    pickerGMap.setCenter(initialPos);
+                    pickerGMap.setZoom(13);
+                    pickerGMarker.setPosition(initialPos);
+                }
+            }, 150);
+        }
+
+        function syncPickerMarkerFromInputs() {
+            const lat = parseFloat(document.getElementById('prop-form-lat').value);
+            const lng = parseFloat(document.getElementById('prop-form-lng').value);
+            if (!isNaN(lat) && !isNaN(lng) && pickerGMap && pickerGMarker) {
+                const pos = { lat, lng };
+                pickerGMarker.setPosition(pos);
+                pickerGMap.panTo(pos);
+            }
+        }
+
+        function closePropertyFormModal() {
+            const modal = document.getElementById('modal-property-form');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        async function handlePropertyFormSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-save-property');
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            const id = document.getElementById('prop-form-id').value;
+            const type = document.getElementById('prop-form-type').value;
+            const residential = isResidential(type);
+
+            const propertyData = {
+                id: id || 'prop_' + Date.now(),
+                category: document.getElementById('prop-form-category').value,
+                name: document.getElementById('prop-form-name').value.trim(),
+                type: type,
+                bedrooms: residential ? parseInt(document.getElementById('prop-form-bedrooms').value || 0, 10) : 0,
+                bathrooms: residential ? parseInt(document.getElementById('prop-form-bathrooms').value || 0, 10) : 0,
+                price: parseFloat(document.getElementById('prop-form-price').value),
+                landSize: parseFloat(document.getElementById('prop-form-land').value),
+                builtUpArea: parseFloat(document.getElementById('prop-form-buildup').value),
+                location: document.getElementById('prop-form-location').value.trim(),
+                agentId: document.getElementById('prop-form-agent').value,
+                lat: parseFloat(document.getElementById('prop-form-lat').value),
+                lng: parseFloat(document.getElementById('prop-form-lng').value),
+                image: document.getElementById('prop-form-image').value.trim(),
+                description: document.getElementById('prop-form-desc').value.trim()
+            };
+
+            try {
+                const assignedAgent = getAgentById(propertyData.agentId);
+                await supabaseClient.from('agents').upsert(assignedAgent, { onConflict: 'id' });
+
+                let { error } = await supabaseClient
+                    .from('properties')
+                    .upsert(toDbProperty(propertyData), { onConflict: 'id' });
+
+                if (error && error.message && error.message.toLowerCase().includes('category')) {
+                    const { category, ...dbPayloadWithoutCategory } = toDbProperty(propertyData);
+                    const retry = await supabaseClient
+                        .from('properties')
+                        .upsert(dbPayloadWithoutCategory, { onConflict: 'id' });
+                    error = retry.error;
+                }
+
+                if (error) {
+                    if (error.code === 'PGRST205') {
+                        properties = properties.some(p => p.id === propertyData.id)
+                            ? properties.map(p => p.id === propertyData.id ? propertyData : p)
+                            : [propertyData, ...properties];
+                        closePropertyFormModal();
+                        renderDashboard();
+                        renderPublicListings();
+                        showToast('Property saved locally. Run SQL schema in Supabase to sync to cloud.', 'info');
+                        return;
+                    }
+                    throw error;
+                }
+
+                closePropertyFormModal();
+                await syncFromSupabase(false);
+                showToast(id ? 'Property listing updated in Supabase!' : 'New property saved to Supabase & pinned on map!', 'success');
+            } catch (err) {
+                console.error('Supabase property upsert error:', err);
+                showToast(`Failed to save property: ${err.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Save to Supabase';
+            }
+        }
+
+        async function deleteProperty(propId) {
+            if (!isSupabaseSchemaReady) {
+                properties = properties.filter(p => p.id !== propId);
+                renderDashboard();
+                renderPublicListings();
+                showToast('Property removed locally.', 'info');
+                return;
+            }
+
+            try {
+                const { error } = await supabaseClient
+                    .from('properties')
+                    .delete()
+                    .eq('id', propId);
+
+                if (error) throw error;
+
+                await syncFromSupabase(false);
+                showToast('Property deleted from Supabase.', 'info');
+            } catch (err) {
+                console.error('Supabase property delete error:', err);
+                showToast(`Failed to delete property: ${err.message}`, 'error');
+            }
+        }
+
+        // 13. SUPER ADMIN AGENT REGISTRATION & EDITING (SUPABASE CRUD)
+        function refreshAgentAvatarPreview() {
+            const nameVal = document.getElementById('agent-form-name')?.value || 'AG';
+            const avatarVal = (document.getElementById('agent-form-avatar')?.value || '').trim();
+            const initialsEl = document.getElementById('agent-avatar-initials');
+            const imgEl = document.getElementById('agent-avatar-preview-img');
+
+            if (initialsEl) initialsEl.textContent = getAgentInitials(nameVal);
+
+            if (imgEl) {
+                if (avatarVal) {
+                    imgEl.src = avatarVal;
+                    imgEl.classList.remove('hidden');
+                    if (initialsEl) initialsEl.classList.add('hidden');
+                } else {
+                    imgEl.src = '';
+                    imgEl.classList.add('hidden');
+                    if (initialsEl) initialsEl.classList.remove('hidden');
+                }
+            }
+        }
+
+        function handleAgentPreviewImgError() {
+            const imgEl = document.getElementById('agent-avatar-preview-img');
+            const initialsEl = document.getElementById('agent-avatar-initials');
+            if (imgEl) imgEl.classList.add('hidden');
+            if (initialsEl) initialsEl.classList.remove('hidden');
+        }
+
+        function handleAgentAvatarUrlInput() {
+            const urlInput = document.getElementById('agent-form-avatar-url');
+            const hiddenAvatar = document.getElementById('agent-form-avatar');
+            if (!urlInput || !hiddenAvatar) return;
+
+            hiddenAvatar.value = urlInput.value.trim();
+            refreshAgentAvatarPreview();
+        }
+
+        function clearAgentAvatar() {
+            document.getElementById('agent-form-avatar').value = '';
+            document.getElementById('agent-form-avatar-url').value = '';
+            const fileInput = document.getElementById('agent-form-file');
+            if (fileInput) fileInput.value = '';
+            const statusEl = document.getElementById('agent-upload-status');
+            if (statusEl) statusEl.textContent = 'Photo cleared. Initials avatar will be used.';
+            refreshAgentAvatarPreview();
+        }
+
+        function handleAgentImageUpload(event) {
+            const file = event.target.files?.[0];
+            const statusEl = document.getElementById('agent-upload-status');
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                showToast('Please select a valid image file (PNG, JPG, WEBP).', 'error');
+                return;
+            }
+
+            if (statusEl) statusEl.textContent = `Processing "${file.name}"...`;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const maxDim = 400;
+                    let width = img.width;
+                    let height = img.height;
+                    if (width > height) {
+                        if (width > maxDim) {
+                            height = Math.round((height * maxDim) / width);
+                            width = maxDim;
+                        }
+                    } else {
+                        if (height > maxDim) {
+                            width = Math.round((width * maxDim) / height);
+                            height = maxDim;
+                        }
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                    document.getElementById('agent-form-avatar').value = compressedDataUrl;
+                    document.getElementById('agent-form-avatar-url').value = '';
+                    if (statusEl) statusEl.textContent = `Uploaded & optimized (${width}×${height}px).`;
+                    refreshAgentAvatarPreview();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function openAgentFormModal(agentId = null) {
+            if (!currentUser || currentUser.role !== 'Super Admin') {
+                showToast('Access Denied: Super Admin privileges required.', 'error');
+                return;
+            }
+
+            const modal = document.getElementById('modal-agent-form');
+            const title = document.getElementById('agent-form-title');
+            const fileInput = document.getElementById('agent-form-file');
+            const statusEl = document.getElementById('agent-upload-status');
+            if (fileInput) fileInput.value = '';
+            if (statusEl) statusEl.textContent = 'Supports PNG, JPG, WEBP (auto-resized to max 400px for fast sync).';
+
+            if (agentId) {
+                const agent = users.find(u => u.id === agentId);
+                if (!agent) return;
+                title.textContent = 'Edit Agent Account';
+                document.getElementById('agent-form-id').value = agent.id;
+                document.getElementById('agent-form-name').value = agent.name;
+                document.getElementById('agent-form-email').value = agent.email;
+                document.getElementById('agent-form-password').value = agent.password;
+                document.getElementById('agent-form-phone').value = agent.phone;
+                document.getElementById('agent-form-ren').value = agent.ren;
+                document.getElementById('agent-form-role-display').value = agent.role;
+                const existingAvatar = agent.avatar || '';
+                document.getElementById('agent-form-avatar').value = existingAvatar;
+                document.getElementById('agent-form-avatar-url').value = existingAvatar.startsWith('data:') ? '' : existingAvatar;
+            } else {
+                title.textContent = 'Register New Agent';
+                document.getElementById('agent-form-id').value = '';
+                document.getElementById('agent-form-name').value = '';
+                document.getElementById('agent-form-email').value = '';
+                document.getElementById('agent-form-password').value = '';
+                document.getElementById('agent-form-phone').value = '+60 1';
+                document.getElementById('agent-form-ren').value = 'REN ';
+                document.getElementById('agent-form-role-display').value = 'Agent';
+                document.getElementById('agent-form-avatar').value = '';
+                document.getElementById('agent-form-avatar-url').value = '';
+            }
+
+            refreshAgentAvatarPreview();
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeAgentFormModal() {
+            const modal = document.getElementById('modal-agent-form');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        async function handleAgentFormSubmit(e) {
+            e.preventDefault();
+            if (!currentUser || currentUser.role !== 'Super Admin') return;
+
+            const btn = document.getElementById('btn-save-agent');
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            const id = document.getElementById('agent-form-id').value;
+            const email = document.getElementById('agent-form-email').value.trim().toLowerCase();
+
+            const duplicate = users.find(u => u.email.toLowerCase() === email && u.id !== id);
+            if (duplicate) {
+                showToast('An account with this email already exists.', 'error');
+                btn.disabled = false;
+                btn.textContent = 'Save Agent Account';
+                return;
+            }
+
+            const existing = id ? users.find(u => u.id === id) : null;
+            const agentPayload = {
+                id: id || 'usr_agent_' + Date.now(),
+                name: document.getElementById('agent-form-name').value.trim(),
+                email: email,
+                password: document.getElementById('agent-form-password').value,
+                role: existing ? existing.role : 'Agent',
+                phone: document.getElementById('agent-form-phone').value.trim(),
+                ren: document.getElementById('agent-form-ren').value.trim(),
+                avatar: (document.getElementById('agent-form-avatar')?.value || '').trim()
+            };
+
+            try {
+                const { error } = await supabaseClient
+                    .from('agents')
+                    .upsert(agentPayload, { onConflict: 'id' });
+
+                if (error) {
+                    if (error.code === 'PGRST205') {
+                        users = users.some(u => u.id === agentPayload.id)
+                            ? users.map(u => u.id === agentPayload.id ? agentPayload : u)
+                            : [...users, agentPayload];
+                        closeAgentFormModal();
+                        updateAuthUI();
+                        renderDashboard();
+                        renderPublicAgentsSection();
+                        showToast('Agent saved locally. Create public.agents in Supabase SQL Editor to persist to cloud.', 'info');
+                        return;
+                    }
+
+                    if (error.message && error.message.toLowerCase().includes('avatar')) {
+                        const { avatar, ...payloadWithoutAvatar } = agentPayload;
+                        const { error: retryError } = await supabaseClient
+                            .from('agents')
+                            .upsert(payloadWithoutAvatar, { onConflict: 'id' });
+                        if (retryError) throw retryError;
+
+                        users = users.some(u => u.id === agentPayload.id)
+                            ? users.map(u => u.id === agentPayload.id ? agentPayload : u)
+                            : [...users, agentPayload];
+                        closeAgentFormModal();
+                        updateAuthUI();
+                        renderDashboard();
+                        renderPublicAgentsSection();
+                        showToast('Agent saved! Run: alter table public.agents add column if not exists avatar text; in Supabase to persist photos in DB.', 'info');
+                        return;
+                    }
+                    throw error;
+                }
+
+                closeAgentFormModal();
+                await syncFromSupabase(false);
+                showToast(id ? 'Agent profile updated in Supabase.' : `Agent ${agentPayload.name} registered in Supabase!`, 'success');
+            } catch (err) {
+                console.error('Supabase agent upsert error:', err);
+                showToast(`Failed to save agent: ${err.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Save Agent Account';
+            }
+        }
+
+        async function deleteAgent(agentId) {
+            if (!currentUser || currentUser.role !== 'Super Admin') return;
+            const target = users.find(u => u.id === agentId);
+            if (!target || target.role === 'Super Admin') return;
+
+            if (!isSupabaseSchemaReady) {
+                properties = properties.map(p => p.agentId === agentId ? { ...p, agentId: currentUser.id } : p);
+                users = users.filter(u => u.id !== agentId);
+                renderDashboard();
+                renderPublicAgentsSection();
+                renderPublicListings();
+                showToast('Agent removed locally. Run SQL in supabase_guide.md to sync with Supabase.', 'info');
+                return;
+            }
+
+            try {
+                const { error: reassignError } = await supabaseClient
+                    .from('properties')
+                    .update({ agent_id: currentUser.id })
+                    .eq('agent_id', agentId);
+
+                if (reassignError) throw reassignError;
+
+                const { error: deleteError } = await supabaseClient
+                    .from('agents')
+                    .delete()
+                    .eq('id', agentId);
+
+                if (deleteError) throw deleteError;
+
+                await syncFromSupabase(false);
+                showToast('Agent removed & listings reassigned to Super Admin.', 'info');
+            } catch (err) {
+                showToast(`Failed to remove agent: ${err.message}`, 'error');
+            }
+        }
+
+        // 14. TOAST NOTIFICATIONS
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+
+            const colors = {
+                success: 'bg-emerald-600 text-white',
+                error: 'bg-rose-600 text-white',
+                info: 'bg-slate-900 text-white'
+            };
+
+            const icons = {
+                success: 'fa-circle-check',
+                error: 'fa-circle-exclamation',
+                info: 'fa-circle-info'
+            };
+
+            toast.className = `${colors[type] || colors.info} px-4 py-3 rounded-xl shadow-lg text-xs font-semibold flex items-center gap-2.5 animate-fade-in pointer-events-auto`;
+            toast.innerHTML = `<i class="fa-solid ${icons[type] || icons.info}"></i><span>${message}</span>`;
+
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3200);
+        }
+    </script>
+
+    <!-- Google Maps JavaScript API with exact provided API Key -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD5XBfOs7rzE-LCUU-jOVjkwwT70nB84BY&callback=initGoogleMaps"></script>
+</body>
+</html>
